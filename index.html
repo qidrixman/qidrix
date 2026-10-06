@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Qidrix | Интегратор промышленных инноваций</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    
+    <script>
+        if ('scrollRestoration' in history) {
+            history.scrollRestoration = 'manual';
+        }
+        if (window.location.hash) {
+            window.history.replaceState(null, null, window.location.pathname);
+        }
+        window.scrollTo(0, 0);
+    </script>
+
+    <style>
+        /* === ТЕМНЫЕ И СВЕТЛЫЕ ПЕРЕМЕННЫЕ === */
+        :root, [data-theme="dark"] {
+            --bg-main: #121417;
+            --bg-panel: #1E2126;
+            --bg-header: rgba(18, 20, 23, 0.85);
+            --bg-overlay: rgba(18, 20, 23, 0.8);
+            --text-main: #F3F4F6;
+            --text-muted: #9CA3AF;
+            --accent-cyan: #00E5FF;
+            --accent-amber: #FFB800;
+            --border: rgba(255, 255, 255, 0.05);
+            --grid-line: rgba(0, 229, 255, 0.05);
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            --shadow-hover: 0 0 15px rgba(0, 229, 255, 0.2);
+        }
+
+        [data-theme="light"] {
+            --bg-main: #F8FAFC;
+            --bg-panel: #FFFFFF;
+            --bg-header: rgba(248, 250, 252, 0.9);
+            --bg-overlay: rgba(15, 23, 42, 0.6);
+            --text-main: #0F172A;
+            --text-muted: #475569;
+            --accent-cyan: #0284C7;
+            --accent-amber: #D97706;
+            --border: #E2E8F0;
+            --grid-line: rgba(2, 132, 199, 0.05);
+            --shadow: 0 4px 15px rgba(15, 23, 42, 0.05);
+            --shadow-hover: 0 10px 25px rgba(2, 132, 199, 0.15);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; scroll-padding-top: 80px; } 
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            transition: background-color 0.4s ease, color 0.4s ease;
+            overflow-x: hidden;
+        }
+
+        .grid-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background-image: 
+                linear-gradient(var(--grid-line) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: -1;
+            transition: background-image 0.4s ease;
+        }
+
+        /* === НАВИГАЦИЯ (HEADER) === */
+        header { 
+            background-color: var(--bg-header); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            position: fixed; width: 100%; top: 0; z-index: 1000; border-bottom: 1px solid var(--border); 
+            transition: 0.4s ease; 
+        }
+        
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; width: 100%; }
+        nav { display: flex; justify-content: space-between; align-items: center; height: 80px; }
+        
+        .logo { display: flex; align-items: center; gap: 15px; text-decoration: none; }
+        .logo-svg { width: 36px; height: 36px; }
+        .logo-text { font-size: 26px; font-weight: 800; color: var(--text-main); letter-spacing: -1px; transition: 0.4s; }
+        .logo-text span { color: var(--accent-cyan); }
+        
+        .nav-links { display: flex; gap: 28px; list-style: none; }
+        .nav-links a { color: var(--text-muted); text-decoration: none; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s; }
+        .nav-links a:hover { color: var(--accent-cyan); }
+        
+        .nav-right { display: flex; align-items: center; gap: 12px; }
+
+        .icon-btn { 
+            background: var(--bg-panel); border: 1px solid var(--border); color: var(--text-main); 
+            cursor: pointer; display: flex; align-items: center; justify-content: center; 
+            border-radius: 50%; transition: 0.3s; box-shadow: var(--shadow); 
+        }
+        .theme-toggle-btn { width: 42px; height: 42px; }
+        .theme-toggle-btn:hover { border-color: var(--accent-cyan); color: var(--accent-cyan); transform: rotate(15deg); }
+        .theme-toggle-btn svg { width: 18px; height: 18px; }
+
+        .lang-dropdown { position: relative; display: inline-block; }
+        .lang-menu-btn { 
+            background: var(--bg-panel); border: 1px solid var(--border); color: var(--text-main); 
+            cursor: pointer; display: flex; align-items: center; gap: 8px; padding: 10px 18px; 
+            border-radius: 20px; font-size: 14px; font-weight: 600; transition: 0.3s; box-shadow: var(--shadow); 
+        }
+        .lang-menu-btn:hover, .lang-dropdown.active .lang-menu-btn { border-color: var(--accent-cyan); color: var(--accent-cyan); }
+        .lang-menu-btn svg { width: 18px; height: 18px; }
+        
+        .lang-dropdown-content { 
+            position: absolute; top: 100%; right: 0; margin-top: 10px; background: var(--bg-panel); 
+            border: 1px solid var(--border); border-radius: 12px; padding: 8px; display: flex; 
+            flex-direction: column; gap: 4px; box-shadow: var(--shadow); min-width: 150px; 
+            opacity: 0; visibility: hidden; transform: translateY(-10px); transition: 0.3s; z-index: 1001; 
+        }
+        .lang-dropdown-content.show { opacity: 1; visibility: visible; transform: translateY(0); }
+        .lang-dropdown-btn { 
+            background: none; border: none; color: var(--text-muted); padding: 10px 16px; 
+            text-align: left; cursor: pointer; border-radius: 8px; font-weight: 600; font-size: 13px; 
+            transition: 0.2s; display: flex; align-items: center; gap: 8px; white-space: nowrap; 
+        }
+        .lang-dropdown-btn:hover, .lang-dropdown-btn.active { background: var(--border); color: var(--accent-cyan); }
+
+        .burger-btn { background: none; border: none; color: var(--text-main); cursor: pointer; display: none; align-items: center; padding: 4px; transition: 0.3s; }
+        
+        /* Мобильное меню */
+        .panel-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background: var(--bg-overlay); backdrop-filter: blur(4px); z-index: 1999; opacity: 0; visibility: hidden; transition: 0.4s; pointer-events: none;}
+        .panel-overlay.open { opacity: 1; visibility: visible; pointer-events: auto;}
+        .side-panel { position: fixed; top: 0; right: -320px; width: 320px; max-width: 100%; height: 100vh; background: var(--bg-panel); z-index: 2000; box-shadow: -10px 0 40px rgba(0,0,0,0.5); transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.4s; padding: 60px 30px; border-left: 1px solid var(--border); overflow-y: auto; }
+        .side-panel.open { right: 0; }
+        .close-btn { position: absolute; top: 24px; right: 24px; background: none; border: none; color: var(--text-muted); cursor: pointer; transition: 0.3s; }
+        .close-btn:hover { color: var(--text-main); transform: rotate(90deg); }
+        .mobile-nav-links { display: flex; flex-direction: column; gap: 24px; list-style: none; }
+        .mobile-nav-links a { color: var(--text-main); text-decoration: none; font-size: 18px; font-weight: 600; transition: 0.3s; display: block; }
+        .mobile-nav-links a:hover { color: var(--accent-cyan); }
+
+        /* === ОСНОВНОЙ КОНТЕНТ === */
+        section {
+            min-height: calc(100vh - 80px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 40px 10vw;
+            border-bottom: 1px solid var(--border);
+            position: relative;
+            transition: border-color 0.4s ease;
+        }
+
+        h1 { font-size: 56px; font-weight: 800; letter-spacing: -2px; margin-bottom: 20px; line-height: 1.1; transition: color 0.4s; }
+        h1 span { color: var(--accent-cyan); }
+        h2 { font-size: 36px; font-weight: 600; margin-bottom: 40px; color: var(--text-main); transition: color 0.4s; }
+        p { font-size: 18px; color: var(--text-muted); max-width: 800px; line-height: 1.6; transition: color 0.4s; }
+        
+        .mono {
+            font-family: 'Fira Code', monospace;
+            color: var(--accent-cyan);
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            display: block;
+            transition: color 0.4s;
+        }
+
+        .hero-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 40px; }
+        .grid-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; margin-top: 40px; }
+
+        .card {
+            background: var(--bg-panel);
+            padding: 30px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            border-top: 2px solid transparent;
+            transition: 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            box-shadow: var(--shadow);
+            color: inherit;
+            text-decoration: none;
+        }
+
+        a.card { cursor: pointer; }
+
+        .card:hover { border-top: 2px solid var(--accent-cyan); transform: translateY(-5px); box-shadow: var(--shadow-hover); }
+
+        .card-icon { width: 32px; height: 32px; margin-bottom: 20px; transition: 0.4s; }
+        .card-icon.cyan { color: var(--accent-cyan); filter: drop-shadow(0 0 8px rgba(0, 229, 255, 0.2)); }
+        .card-icon.amber { color: var(--accent-amber); filter: drop-shadow(0 0 8px rgba(255, 184, 0, 0.2)); }
+        [data-theme="light"] .card-icon.cyan { filter: none; }
+        [data-theme="light"] .card-icon.amber { filter: none; }
+
+        .card-title { font-size: 20px; font-weight: 600; color: var(--text-main); margin-bottom: 15px; transition: color 0.4s; }
+        .card p { font-size: 15px; margin: 0; }
+        
+        .card-link-btn { margin-top: auto; padding-top: 25px; font-size: 14px; font-weight: 600; color: var(--accent-cyan); display: flex; align-items: center; gap: 5px; transition: 0.3s; }
+        a.card:hover .card-link-btn { gap: 10px; }
+
+        .architecture-flow {
+            display: flex; justify-content: space-between; align-items: flex-start; margin-top: 50px;
+            background: var(--bg-panel); padding: 40px; border-radius: 12px; border: 1px solid var(--border);
+            box-shadow: var(--shadow); transition: 0.4s;
+        }
+
+        .arch-step { text-align: center; flex: 1; display: flex; flex-direction: column; align-items: center; }
+        .arch-icon { width: 28px; height: 28px; color: var(--accent-cyan); margin-bottom: 15px; transition: color 0.4s; }
+        .arch-step .mono { margin-bottom: 10px; font-size: 12px; }
+        .arch-arrow { color: var(--accent-cyan); font-size: 24px; margin: 0 20px; margin-top: 40px; transition: color 0.4s; }
+
+        /* ВЕКТОРНАЯ ГРАФИКА ДЛЯ ТЕМЫ */
+        .svg-stroke-muted { stroke: var(--text-muted); transition: 0.4s; }
+        .svg-stroke-cyan { stroke: var(--accent-cyan); transition: 0.4s; }
+        .svg-stroke-amber { stroke: var(--accent-amber); transition: 0.4s; }
+        .svg-fill-amber { fill: var(--accent-amber); transition: 0.4s; }
+        .svg-fill-cyan { fill: var(--accent-cyan); transition: 0.4s; }
+        .svg-fill-main { fill: var(--text-main); transition: 0.4s; }
+        .svg-fill-panel { fill: var(--bg-panel); transition: 0.4s; }
+        .svg-fill-bg { fill: var(--bg-main); transition: 0.4s; }
+
+        /* БОКОВЫЕ ТОЧКИ НАВИГАЦИИ */
+        .nav-dots { position: fixed; right: 30px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 15px; z-index: 10; }
+        .nav-dots a { width: 10px; height: 10px; border-radius: 50%; background: var(--text-muted); opacity: 0.3; transition: 0.3s; }
+        .nav-dots a:hover { opacity: 1; background: var(--accent-cyan); box-shadow: 0 0 10px var(--accent-cyan); }
+
+        @media (max-width: 1024px) {
+            .nav-links { display: none; }
+            .burger-btn { display: flex; }
+        }
+
+        @media (max-width: 768px) {
+            section { min-height: auto; padding: 40px 20px; }
+            .nav-dots { display: none; }
+            h1 { font-size: 40px; margin-bottom: 10px; }
+            h2 { font-size: 28px; margin-bottom: 20px; }
+            p { font-size: 16px; }
+            .hero-grid { grid-template-columns: 1fr; gap: 20px; }
+            .hero-image { display: none; }
+            .grid-2, .grid-cards { grid-template-columns: 1fr; gap: 16px; margin-top: 24px; }
+            .card { padding: 20px; }
+            .card-icon { width: 24px; height: 24px; margin-bottom: 15px; }
+            .card-title { font-size: 18px; }
+            .architecture-flow { flex-direction: column; gap: 16px; padding: 20px; margin-top: 24px; align-items: center; }
+            .arch-arrow { transform: rotate(90deg); margin: 0; }
+            #slide-1 > div { gap: 15px !important; margin-bottom: 20px !important; }
+            #slide-1 { margin-top: 80px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="grid-bg"></div>
+
+    <header>
+        <div class="container">
+            <nav>
+                <a href="#" class="logo">
+                    <svg class="logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M 10 10 H 80 V 60 H 60 V 30 H 30 V 60 H 60 V 80 H 10 Z" class="svg-fill-main" />
+                        <rect x="60" y="60" width="30" height="30" class="svg-fill-cyan" />
+                    </svg>
+                    <div class="logo-text">Qidri<span>x</span></div>
+                </a>
+                
+                <ul class="nav-links">
+                    <li><a href="#slide-2" data-ru="Подход" data-en="Approach" data-kk="Тәсіл" data-uz="Yondashuv">Подход</a></li>
+                    <li><a href="#slide-3" data-ru="Решения" data-en="Solutions" data-kk="Шешімдер" data-uz="Yechimlar">Решения</a></li>
+                    <li><a href="#slide-4" data-ru="Архитектура" data-en="Architecture" data-kk="Сәулет" data-uz="Arxitektura">Архитектура</a></li>
+                    <li><a href="#slide-5" data-ru="Экономика" data-en="Economics" data-kk="Экономика" data-uz="Iqtisodiyot">Экономика</a></li>
+                </ul>
+
+                <div class="nav-right">
+                    <button class="theme-toggle-btn icon-btn" onclick="toggleTheme()" aria-label="Toggle Theme" id="themeBtn">
+                        <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                        </svg>
+                    </button>
+
+                    <div class="lang-dropdown" id="langDropdown">
+                        <button class="lang-menu-btn" onclick="toggleDropdown(event)" aria-label="Select Language">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="2" y1="12" x2="22" y2="12"></line>
+                                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1 4-10z"></path>
+                            </svg>
+                            <span id="currentLangDisplay">RU</span>
+                        </button>
+                        <div class="lang-dropdown-content" id="langContent">
+                            <button class="lang-dropdown-btn" data-lang="en" onclick="setLang('en')"><span class="lang-flag">🇬🇧</span> English</button>
+                            <button class="lang-dropdown-btn" data-lang="uz" onclick="setLang('uz')"><span class="lang-flag">🇺🇿</span> O'zbek</button>
+                            <button class="lang-dropdown-btn" data-lang="kk" onclick="setLang('kk')"><span class="lang-flag">🇰🇿</span> Қазақша</button>
+                            <button class="lang-dropdown-btn active" data-lang="ru" onclick="setLang('ru')"><span class="lang-flag">🇷🇺</span> Русский</button>
+                        </div>
+                    </div>
+                    
+                    <button class="burger-btn" onclick="toggleMenu()" aria-label="Menu">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="3" y1="12" x2="21" y2="12"></line>
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <line x1="3" y1="18" x2="21" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <div class="panel-overlay" id="panelOverlay" onclick="toggleMenu()"></div>
+    <div class="side-panel" id="sidePanel">
+        <button class="close-btn" onclick="toggleMenu()">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+        </button>
+        <div class="panel-content">
+            <ul class="mobile-nav-links">
+                <li><a href="#slide-2" onclick="toggleMenu()" data-ru="Подход" data-en="Approach" data-kk="Тәсіл" data-uz="Yondashuv">Подход</a></li>
+                <li><a href="#slide-3" onclick="toggleMenu()" data-ru="Решения" data-en="Solutions" data-kk="Шешімдер" data-uz="Yechimlar">Решения</a></li>
+                <li><a href="#slide-4" onclick="toggleMenu()" data-ru="Архитектура" data-en="Architecture" data-kk="Сәулет" data-uz="Arxitektura">Архитектура</a></li>
+                <li><a href="#slide-5" onclick="toggleMenu()" data-ru="Экономика" data-en="Economics" data-kk="Экономика" data-uz="Iqtisodiyot">Экономика</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="nav-dots">
+        <a href="#slide-1" title="Главная"></a>
+        <a href="#slide-2" title="Наш подход"></a>
+        <a href="#slide-3" title="Отраслевые решения"></a>
+        <a href="#slide-4" title="Как это работает"></a>
+        <a href="#slide-5" title="Экономика"></a>
+    </div>
+
+    <!-- Слайд 1 -->
+    <section id="slide-1">
+        <div class="hero-grid">
+            <div class="hero-text">
+                <span class="mono" data-ru="ПРЕЗЕНТАЦИЯ ИНТЕГРАТОРА" data-en="INTEGRATOR PRESENTATION" data-kk="ИНТЕГРАТОР ТҰСАУКЕСЕРІ" data-uz="INTEGRATOR TAQDIMOTI">ПРЕЗЕНТАЦИЯ ИНТЕГРАТОРА</span>
+                <h1 style="margin: 0;" data-ru="Интеграция промышленных инноваций" data-en="Integration of industrial innovations" data-kk="Өнеркәсіптік инновацияларды біріктіру" data-uz="Sanoat innovatsiyalarini integratsiyalash">Интеграция промышленных инноваций</h1>
+                <p data-ru="Находим лучшие технологии на рынке, от смарт-камер до алгоритмов ИИ, и превращаем их в измеримый финансовый результат для вашего предприятия." data-en="We find the best technologies on the market, from smart cameras to AI algorithms, and turn them into a measurable financial result for your enterprise." data-kk="Біз смарт-камералардан ЖИ алгоритмдеріне дейін нарықтағы ең жақсы технологияларды табамыз және оларды сіздің кәсіпорныңыз үшін өлшенетін қаржылық нәтижеге айналдырамыз." data-uz="Biz bozordagi aqlli kameralardan SI algoritmlarigacha bo'lgan eng yaxshi texnologiyalarni topamiz va ularni korxonangiz uchun o'lchanadigan moliyaviy natijaga aylantiramiz.">Находим лучшие технологии на рынке, от смарт-камер до алгоритмов ИИ, и превращаем их в измеримый финансовый результат для вашего предприятия.</p>
+            </div>
+            
+            <div class="hero-image">
+                <svg viewBox="0 0 500 400" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: auto;">
+                    <path d="M 112 80 L 160 80 L 160 176 L 208 176" class="svg-stroke-muted" stroke-width="2" stroke-dasharray="6 6" />
+                    <path d="M 112 200 L 208 200" class="svg-stroke-muted" stroke-width="2" stroke-dasharray="6 6" />
+                    <path d="M 112 320 L 160 320 L 160 224 L 208 224" class="svg-stroke-muted" stroke-width="2" stroke-dasharray="6 6" />
+                    <path d="M 292 176 L 340 176 L 340 80 L 388 80" class="svg-stroke-cyan" stroke-width="3" stroke-linejoin="round" />
+                    <path d="M 292 200 L 388 200" class="svg-stroke-cyan" stroke-width="3" />
+                    <path d="M 292 224 L 340 224 L 340 320 L 388 320" class="svg-stroke-cyan" stroke-width="3" stroke-linejoin="round" />
+                    <circle cx="136" cy="80" r="4.5" class="svg-fill-amber" />
+                    <circle cx="192" cy="200" r="4.5" class="svg-fill-amber" />
+                    <circle cx="160" cy="224" r="4.5" class="svg-fill-amber" />
+                    <circle cx="364" cy="80" r="4.5" class="svg-fill-bg" stroke="var(--border)" stroke-width="2"/>
+                    <circle cx="316" cy="200" r="4.5" class="svg-fill-bg" stroke="var(--border)" stroke-width="2"/>
+                    <circle cx="340" cy="272" r="4.5" class="svg-fill-bg" stroke="var(--border)" stroke-width="2"/>
+                    <rect x="48" y="48" width="64" height="64" rx="12" class="svg-fill-panel svg-stroke-amber" stroke-width="3" />
+                    <path d="M 64 88 L 70 76 H 90 L 96 88 Z" class="svg-fill-amber" />
+                    <circle cx="80" cy="82" r="2.5" class="svg-fill-panel" />
+                    <rect x="48" y="168" width="64" height="64" rx="12" class="svg-fill-panel svg-stroke-amber" stroke-width="3" />
+                    <rect x="72" y="186" width="16" height="28" rx="2" class="svg-fill-amber" />
+                    <rect x="64" y="196" width="32" height="8" rx="2" class="svg-fill-amber" />
+                    <rect x="48" y="288" width="64" height="64" rx="12" class="svg-fill-panel svg-stroke-amber" stroke-width="3" />
+                    <rect x="64" y="308" width="20" height="14" rx="2" class="svg-fill-amber" />
+                    <rect x="86" y="311" width="8" height="8" rx="1" class="svg-fill-amber" />
+                    <rect x="388" y="48" width="64" height="64" rx="12" class="svg-fill-panel svg-stroke-cyan" stroke-width="3" />
+                    <ellipse cx="420" cy="74" rx="14" ry="4" class="svg-fill-cyan" />
+                    <path d="M 406 74 V 86 C 406 88.2 412.3 90 420 90 C 427.7 90 434 88.2 434 86 V 74" class="svg-fill-panel svg-stroke-cyan" stroke-width="3" />
+                    <rect x="388" y="168" width="64" height="64" rx="12" class="svg-fill-panel svg-stroke-cyan" stroke-width="3" />
+                    <path d="M 400 210 C 400 196 408 186 420 186 C 432 186 440 210 Z" class="svg-fill-panel svg-stroke-cyan" stroke-width="3" />
+                    <rect x="396" y="210" width="48" height="3" class="svg-fill-cyan" />
+                    <rect x="388" y="288" width="64" height="64" rx="12" class="svg-fill-panel svg-stroke-cyan" stroke-width="3" />
+                    <rect x="402" y="304" width="36" height="22" rx="3" class="svg-fill-panel svg-stroke-cyan" stroke-width="3" />
+                    <rect x="414" y="326" width="12" height="4" class="svg-fill-cyan" />
+                    <rect x="208" y="158" width="84" height="84" rx="16" class="svg-fill-panel svg-stroke-cyan" stroke-width="4" />
+                    <path d="M 230 178 H 270 V 208 H 258 V 190 H 242 V 208 H 258 V 220 H 230 Z" class="svg-fill-main" />
+                    <rect x="258" y="208" width="16" height="16" class="svg-fill-cyan" />
+                </svg>
+            </div>
+        </div>
+    </section>
+
+    <!-- Слайд 2 -->
+    <section id="slide-2">
+        <span class="mono" data-ru="01. Наш подход" data-en="01. Our Approach" data-kk="01. Біздің тәсіл" data-uz="01. Bizning yondashuv">01. Наш подход</span>
+        <h2 data-ru="Разрыв между IT и физикой" data-en="The gap between IT and reality" data-kk="IT және шындық арасындағы үзіліс" data-uz="IT va reallik o'rtasidagi tafovut">Разрыв между IT и физикой</h2>
+        <div class="grid-2">
+            <div class="card">
+                <svg class="card-icon amber" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="14" width="7" height="7"></rect>
+                    <rect x="3" y="14" width="7" height="7"></rect>
+                    <path d="M10 10l4 4m0-4l-4 4" stroke-dasharray="2 2"></path>
+                </svg>
+                <div class="card-title" data-ru="Проблема отрасли" data-en="Industry Problem" data-kk="Сала мәселесі" data-uz="Soha muammosi">Проблема отрасли</div>
+                <p data-ru="Учет ведется в корпоративных системах (1С, ERP), а физическое оборудование работает автономно. Это приводит к ручному вводу данных, очередям, простоям и скрытым убыткам." data-en="Accounting is in corporate systems (1C, ERP), while physical equipment operates autonomously. This leads to manual data entry, queues, downtime, and hidden losses." data-kk="Есепке алу корпоративтік жүйелерде (1С, ERP) жүргізіледі, ал физикалық жабдық автономды жұмыс істейді. Бұл қолмен енгізуге, кезектерге және жасырын шығындарға әкеледі." data-uz="Hisob korporativ tizimlarda (1C, ERP) yuritiladi, jismoniy uskunalar esa avtonom ishlaydi. Bu ma'lumotlarni qo'lda kiritish, navbatlar, to'xtab qolish va yashirin zararlarga olib keladi.">Учет ведется в корпоративных системах (1С, ERP), а физическое оборудование работает автономно. Это приводит к ручному вводу данных, очередям, простоям и скрытым убыткам.</p>
+            </div>
+            <div class="card">
+                <svg class="card-icon cyan" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                    <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                    <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                </svg>
+                <div class="card-title" data-ru="Решение от Qidrix" data-en="Qidrix Solution" data-kk="Qidrix шешімі" data-uz="Qidrix yechimi">Решение от Qidrix</div>
+                <p data-ru="Мы берем на себя риски внедрения. Находим лучшие технологические решения, адаптируем их под ваши задачи и бесшовно встраиваем в текущую IT-архитектуру." data-en="We take on implementation risks. We find the best tech solutions, adapt them to your tasks, and seamlessly integrate them into the current IT architecture." data-kk="Біз енгізу тәуекелдерін өз мойнымызға аламыз. Біз ең жақсы технологиялық шешімдерді табамыз, оларды бейімдейміз және ағымдағы IT-сәулетке біріктіреміз." data-uz="Biz joriy etish xavfini o'z zimmamizga olamiz. Biz eng yaxshi texnologik yechimlarni topamiz, ularni moslashtiramiz va joriy IT-arxitekturaga muammosiz birlashtiramiz.">Мы берем на себя риски внедрения. Находим лучшие технологические решения, адаптируем их под ваши задачи и бесшовно встраиваем в текущую IT-архитектуру.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Слайд 3 (с кликабельными кейсами) -->
+    <section id="slide-3">
+        <span class="mono" data-ru="02. Где мы полезны" data-en="02. Where we are useful" data-kk="02. Біз қайда пайдалымыз" data-uz="02. Biz qayerda foydalimiz">02. Где мы полезны</span>
+        <h2 data-ru="Отраслевые решения" data-en="Industry Solutions" data-kk="Салалық шешімдер" data-uz="Sohaviy yechimlar">Отраслевые решения</h2>
+        <p data-ru="Внедряем модули под конкретную боль вашего бизнеса." data-en="We implement modules for the specific pain of your business." data-kk="Сіздің бизнесіңіздің нақты мәселесі үшін модульдерді енгіземіз." data-uz="Biznesingizning aniq muammosi uchun modullarni joriy qilamiz.">Внедряем модули под конкретную боль вашего бизнеса.</p>
+        
+        <div class="grid-cards">
+            
+            <!-- Карточка: Логистика -->
+            <div class="card">
+                <svg class="card-icon cyan" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="1" y="3" width="15" height="13"></rect>
+                    <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+                    <circle cx="5.5" cy="18.5" r="2.5"></circle>
+                    <circle cx="18.5" cy="18.5" r="2.5"></circle>
+                </svg>
+                <div class="card-title" data-ru="Логистика" data-en="Logistics" data-kk="Логистика" data-uz="Logistika">Логистика</div>
+                <div style="font-weight: 600; color: var(--text-main); margin-bottom: 10px; font-size: 14px;">Yard Management</div>
+                <p data-ru="Электронная очередь, тайм-слоты, автоматические гейты и боты для водителей." data-en="Electronic queue, time slots, automatic gates and bots for drivers." data-kk="Электрондық кезек, тайм-слоттар, автоматты қақпалар және жүргізушілерге арналған боттар." data-uz="Elektron navbat, taym-slotlar, avtomatik darvozalar va haydovchilar uchun botlar.">Электронная очередь, тайм-слоты, автоматические гейты и боты для водителей.</p>
+            </div>
+            
+            <!-- Карточка: Агропромышленность (С КЕЙСОМ) -->
+            <a href="agro/index.html" class="card">
+                <svg class="card-icon cyan" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2L12 22"></path>
+                    <path d="M12 10C9 10 7 8 7 8C7 8 9 6 12 6"></path>
+                    <path d="M12 18C15 18 17 16 17 16C17 16 15 14 12 14"></path>
+                </svg>
+                <div class="card-title" data-ru="Агропромышленность" data-en="Agro-Industry" data-kk="Агроөнеркәсіп" data-uz="Agrosanoat">Агропромышленность</div>
+                <div style="font-weight: 600; color: var(--text-main); margin-bottom: 10px; font-size: 14px;" data-ru="Связь и телеметрия" data-en="Comms & Telemetry" data-kk="Байланыс және телеметрия" data-uz="Aloqa va telemetriya">Связь и телеметрия</div>
+                <p data-ru="Цифровизация полей и спецтехники. Построение спутниковых каналов, автоматизация учета ГСМ и запуск видеоаналитики." data-en="Digitization of fields and special equipment. Building satellite channels, fuel accounting automation, and video analytics." data-kk="Егістіктер мен арнайы техниканы цифрландыру. ЖЖМ есебін автоматтандыру." data-uz="Dalalar va maxsus texnikani raqamlashtirish. Yoqilg'i hisobini avtomatlashtirish.">Цифровизация полей и спецтехники. Построение спутниковых каналов, автоматизация учета ГСМ и запуск видеоаналитики.</p>
+                <div class="card-link-btn" data-ru="Смотреть кейс →" data-en="View Case →" data-kk="Кейсті көру →" data-uz="Keysni ko'rish →">Смотреть кейс →</div>
+            </a>
+            
+            <!-- Карточка: Горная добыча (С КЕЙСОМ) -->
+            <a href="digimine/index.html" class="card">
+                <svg class="card-icon cyan" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
+                    <rect x="6" y="2" width="12" height="8" rx="2" ry="2"></rect>
+                    <line x1="12" y1="14" x2="12" y2="10"></line>
+                    <line x1="6" y1="18" x2="6.01" y2="18"></line>
+                </svg>
+                <div class="card-title" data-ru="Горная добыча" data-en="Mining" data-kk="Тау-кен өндіру" data-uz="Tog'-kon sanoati">Горная добыча</div>
+                <div style="font-weight: 600; color: var(--text-main); margin-bottom: 10px; font-size: 14px;" data-ru="Hardware Интеграция" data-en="Hardware Integration" data-kk="Hardware Интеграциясы" data-uz="Hardware Integratsiyasi">Hardware Интеграция</div>
+                <p data-ru="Сбор данных со сложного оборудования. Монтаж бортовых компьютеров, V2X антенн и систем автономного питания ретрансляторов." data-en="Data collection from complex equipment. Installation of onboard computers, V2X antennas, and autonomous relay power." data-kk="Күрделі жабдықтан деректерді жинау. Борттық компьютерлер мен V2X антенналарын орнату." data-uz="Murakkab uskunadan ma'lumotlarni yig'ish. Bort kompyuterlari va V2X antennalarini o'rnatish.">Сбор данных со сложного оборудования. Монтаж бортовых компьютеров, V2X антенн и систем автономного питания ретрансляторов.</p>
+                <div class="card-link-btn" data-ru="Смотреть кейс →" data-en="View Case →" data-kk="Кейсті көру →" data-uz="Keysni ko'rish →">Смотреть кейс →</div>
+            </a>
+            
+            <!-- Карточка: Умные здания -->
+            <div class="card">
+                <svg class="card-icon cyan" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+                <div class="card-title" data-ru="Умные здания" data-en="Smart Buildings" data-kk="Ақылды ғимараттар" data-uz="Aqlli binolar">Умные здания</div>
+                <div style="font-weight: 600; color: var(--text-main); margin-bottom: 10px; font-size: 14px;" data-ru="Оцифровка процессов" data-en="Digitization of processes" data-kk="Процестерді цифрландыру" data-uz="Jarayonlarni raqamlashtirish">Оцифровка процессов</div>
+                <p data-ru="Перевод механической физики в цифру. Управление освещением, контроль климата и уведомления." data-en="Translating physics into digital. Lighting management, climate control, and notifications." data-kk="Физиканы цифрға аудару. Жарықтандыруды басқару, климатты бақылау және хабарландырулар." data-uz="Fizikani raqamliga aylantirish. Yoritishni boshqarish, iqlim nazorati va xabarnomalar.">Перевод механической физики в цифру. Управление освещением, контроль климата и уведомления.</p>
+            </div>
+            
+            <!-- Карточка: Корпоративные данные -->
+            <div class="card">
+                <svg class="card-icon cyan" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                    <polyline points="10 9 9 9 8 9"></polyline>
+                </svg>
+                <div class="card-title" data-ru="Корпоративные данные" data-en="Corporate Data" data-kk="Корпоративтік деректер" data-uz="Korporativ ma'lumotlar">Корпоративные данные</div>
+                <div style="font-weight: 600; color: var(--text-main); margin-bottom: 10px; font-size: 14px;" data-ru="Интеллектуальный поиск" data-en="Intelligent Search" data-kk="Зияткерлік іздеу" data-uz="Intellektual qidiruv">Интеллектуальный поиск</div>
+                <p data-ru="Парсинг файловых архивов. Создание фильтров для моментального поиска спецификаций и авто-ответы." data-en="Parsing file archives. Creating filters for instant search of specifications and auto-replies." data-kk="Файлдық мұрағаттарды талдау. Сипаттамаларды жылдам іздеу үшін сүзгілерді жасау." data-uz="Fayl arxivlarini tahlil qilish. Xususiyatlarni darhol qidirish uchun filtrlar yaratish.">Парсинг файловых архивов. Создание фильтров для моментального поиска спецификаций и авто-ответы.</p>
+            </div>
+
+            <!-- Карточка: Ритейл -->
+            <div class="card">
+                <svg class="card-icon cyan" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                    <circle cx="12" cy="13" r="4"></circle>
+                </svg>
+                <div class="card-title" data-ru="Ритейл и Недвижимость" data-en="Retail & Real Estate" data-kk="Бөлшек сауда және жылжымайтын мүлік" data-uz="Chakana savdo va ko'chmas mulk">Ритейл и Недвижимость</div>
+                <div style="font-weight: 600; color: var(--text-main); margin-bottom: 10px; font-size: 14px;" data-ru="Аналитика без нового железа" data-en="Analytics without new hardware" data-kk="Жаңа жабдықсыз аналитика" data-uz="Yangi uskunasiz tahlil">Аналитика без нового железа</div>
+                <p data-ru="Подключение ИИ к существующим камерам CCTV. Контроль въезда, очередей и трафика посетителей. Запуск без закупки серверов." data-en="Connecting AI to existing CCTV cameras. Control of entry, queues, and visitor traffic. Launch without buying servers." data-kk="ЖИ-ді бар CCTV камераларына қосу. Кіруді, кезектерді және келушілерді бақылау. Серверлерді сатып алусыз іске қосылады." data-uz="SI ni mavjud CCTV kameralariga ulash. Kirish, navbatlar va tashrif buyuruvchilar trafigini nazorat qilish. Serverlarni sotib olmasdan ishga tushiriladi.">Подключение ИИ к существующим камерам CCTV. Контроль въезда, очередей и трафика посетителей. Запуск без закупки серверов.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Слайд 4 -->
+    <section id="slide-4">
+        <span class="mono" data-ru="03. Технологии" data-en="03. Technologies" data-kk="03. Технологиялар" data-uz="03. Texnologiyalar">03. Технологии</span>
+        <h2 data-ru="Архитектура интеграции" data-en="Integration Architecture" data-kk="Интеграция сәулеті" data-uz="Integratsiya arxitekturasi">Архитектура интеграции</h2>
+        
+        <div class="architecture-flow">
+            <div class="arch-step">
+                <svg class="arch-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"></path>
+                    <path d="M12 12v9"></path>
+                    <path d="M8 17l4 4 4-4"></path>
+                </svg>
+                <span class="mono" style="color: var(--text-main);" data-ru="01. ИСТОЧНИКИ ДАННЫХ" data-en="01. DATA SOURCES" data-kk="01. ДЕРЕКТЕР КӨЗДЕРІ" data-uz="01. MA'LUMOT MANBALARI">01. ИСТОЧНИКИ ДАННЫХ</span>
+                <div style="font-weight: 600;" data-ru="Внешнее оборудование" data-en="External Equipment" data-kk="Сыртқы жабдық" data-uz="Tashqi uskunalar">Внешнее оборудование</div>
+                <div style="font-size: 14px; color: var(--text-muted); margin-top: 10px;" data-ru="Датчики, весовые, камеры" data-en="Sensors, scales, cameras" data-kk="Датчиктер, таразылар, камералар" data-uz="Datchiklar, tarozilar, kameralar">Датчики, весовые, камеры</div>
+            </div>
+            <div class="arch-arrow">→</div>
+            <div class="arch-step">
+                <svg class="arch-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
+                    <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
+                    <line x1="6" y1="6" x2="6.01" y2="6"></line>
+                    <line x1="6" y1="18" x2="6.01" y2="18"></line>
+                </svg>
+                <span class="mono" data-ru="02. ЯДРО QIDRIX" data-en="02. QIDRIX CORE" data-kk="02. QIDRIX ЯДРОСЫ" data-uz="02. QIDRIX YADROSI">02. ЯДРО QIDRIX</span>
+                <div style="font-weight: 600;" data-ru="Сбор и Аналитика" data-en="Collection & Analytics" data-kk="Жинау және аналитика" data-uz="Yig'ish va tahlil">Сбор и Аналитика</div>
+                <div style="font-size: 14px; color: var(--text-muted); margin-top: 10px;" data-ru="API-шлюзы, алгоритмы ИИ" data-en="API gateways, AI algorithms" data-kk="API-шлюздер, ЖИ алгоритмдері" data-uz="API shlyuzlari, SI algoritmlari">API-шлюзы, алгоритмы ИИ</div>
+            </div>
+            <div class="arch-arrow">→</div>
+            <div class="arch-step">
+                <svg class="arch-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="3" y1="9" x2="21" y2="9"></line>
+                    <line x1="9" y1="21" x2="9" y2="9"></line>
+                </svg>
+                <span class="mono" style="color: var(--text-main);" data-ru="03. ВАШИ СИСТЕМЫ" data-en="03. YOUR SYSTEMS" data-kk="03. СІЗДІҢ ЖҮЙЕЛЕРІҢІЗ" data-uz="03. SIZNING TIZIMLARINGIZ">03. ВАШИ СИСТЕМЫ</span>
+                <div style="font-weight: 600;" data-ru="Учет и Управление" data-en="Accounting & Management" data-kk="Есепке алу және басқару" data-uz="Hisob va boshqaruv">Учет и Управление</div>
+                <div style="font-size: 14px; color: var(--text-muted); margin-top: 10px;" data-ru="Ваша 1С/ERP, дашборды" data-en="Your 1C/ERP, dashboards" data-kk="Сіздің 1С/ERP, дашбордтар" data-uz="Sizning 1C/ERP, dashbordlar">Ваша 1С/ERP, дашборды</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Слайд 5 -->
+    <section id="slide-5">
+        <span class="mono" data-ru="04. Экономика" data-en="04. Economics" data-kk="04. Экономика" data-uz="04. Iqtisodiyot">04. Экономика внедрения</span>
+        <h2 data-ru="Гибридная лицензия" data-en="Hybrid License" data-kk="Гибридтік лицензия" data-uz="Gibrid litsenziya">Гибридная лицензия</h2>
+        <div class="grid-2">
+            <div class="card">
+                <svg class="card-icon amber" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                    <polyline points="2 17 12 22 22 17"></polyline>
+                    <polyline points="2 12 12 17 22 12"></polyline>
+                </svg>
+                <div class="card-title" data-ru="Разовые инвестиции (CAPEX)" data-en="One-time investments (CAPEX)" data-kk="Бір реттік инвестициялар (CAPEX)" data-uz="Bir martalik investitsiyalar (CAPEX)">Разовые инвестиции (CAPEX)</div>
+                <p data-ru="Оплата за аппаратное обеспечение, настройку и инфраструктуру. Все железо полностью переходит на баланс предприятия." data-en="Payment for hardware, setup, and infrastructure. All hardware is fully transferred to the balance of the enterprise." data-kk="Жабдық, баптау және инфрақұрылым үшін төлем. Барлық жабдық кәсіпорын балансына толығымен өтеді." data-uz="Uskunalar, sozlash va infratuzilma uchun to'lov. Barcha uskunalar to'liq korxona balansiga o'tkaziladi.">Оплата за аппаратное обеспечение, настройку и инфраструктуру. Все железо полностью переходит на баланс предприятия.</p>
+            </div>
+            <div class="card">
+                <svg class="card-icon amber" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.59-9.21l-5.44-1.36"></path>
+                </svg>
+                <div class="card-title" data-ru="Подписка на результат (OPEX)" data-en="Subscription for result (OPEX)" data-kk="Нәтижеге жазылу (OPEX)" data-uz="Natija uchun obuna (OPEX)">Подписка на результат (OPEX)</div>
+                <p data-ru="Лицензия на предиктивную аналитику и обновления оплачивается регулярно. Вы платите за реально работающий софт и экономию времени." data-en="License for predictive analytics and updates is paid regularly. You pay for actually working software and saved time." data-kk="Болжамдық аналитикаға және жаңартуларға лицензия тұрақты түрде төленеді. Сіз нақты жұмыс істейтін бағдарламалық жасақтама үшін төлейсіз." data-uz="Bashoratli tahlil va yangilanishlar uchun litsenziya muntazam to'lanadi. Siz haqiqatda ishlaydigan dasturiy ta'minot uchun to'laysiz.">Лицензия на предиктивную аналитику и обновления оплачивается регулярно. Вы платите за реально работающий софт и экономию времени.</p>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        let currentLang = 'ru';
+
+        function toggleDropdown(event) {
+            if(event) event.stopPropagation();
+            document.getElementById('langContent').classList.toggle('show');
+        }
+
+        function setLang(lang) {
+            currentLang = lang;
+            localStorage.setItem('qidrix_lang', lang);
+            
+            document.getElementById('currentLangDisplay').innerText = lang.toUpperCase();
+            document.getElementById('langContent').classList.remove('show');
+            
+            document.querySelectorAll('[data-' + lang + ']').forEach(el => {
+                if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+                    el.placeholder = el.getAttribute('data-' + lang);
+                } else {
+                    el.innerHTML = el.getAttribute('data-' + lang);
+                }
+            });
+            
+            document.querySelectorAll('.lang-dropdown-btn').forEach(btn => {
+                const isMatch = btn.getAttribute('data-lang') === lang;
+                btn.classList.toggle('active', isMatch);
+            });
+        }
+
+        function toggleTheme() {
+            const body = document.documentElement;
+            const currentTheme = body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            body.setAttribute('data-theme', newTheme);
+            localStorage.setItem('qidrix_theme', newTheme);
+            updateThemeIcon(newTheme);
+        }
+
+        function updateThemeIcon(theme) {
+            const themeIcon = document.getElementById('themeIcon');
+            if (theme === 'light') {
+                themeIcon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>';
+            } else {
+                themeIcon.innerHTML = '<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>';
+            }
+        }
+
+        function toggleMenu() {
+            document.getElementById('sidePanel').classList.toggle('open');
+            document.getElementById('panelOverlay').classList.toggle('open');
+            document.body.style.overflow = document.getElementById('sidePanel').classList.contains('open') ? 'hidden' : '';
+        }
+
+        window.onclick = function(event) {
+            if (!event.target.closest('.lang-dropdown')) {
+                document.getElementById('langContent').classList.remove('show');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('qidrix_theme');
+            const currentTheme = savedTheme ? savedTheme : 'dark';
+            document.documentElement.setAttribute('data-theme', currentTheme);
+            updateThemeIcon(currentTheme);
+
+            const savedLang = localStorage.getItem('qidrix_lang');
+            if (savedLang) {
+                setLang(savedLang);
+            } else {
+                setLang('ru');
+            }
+        });
+    </script>
+</body>
+</html>
