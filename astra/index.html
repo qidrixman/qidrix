@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Qidrix | Кейс: Astrawireless SCADA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    
+    <script>
+        if ('scrollRestoration' in history) {
+            history.scrollRestoration = 'manual';
+        }
+        if (window.location.hash) {
+            window.history.replaceState(null, null, window.location.pathname);
+        }
+        window.scrollTo(0, 0);
+    </script>
+
+    <style>
+        /* === ТЕМНЫЕ И СВЕТЛЫЕ ПЕРЕМЕННЫЕ === */
+        :root, [data-theme="dark"] {
+            --bg-main: #121417;
+            --bg-panel: #1E2126;
+            --bg-header: rgba(18, 20, 23, 0.85);
+            --bg-overlay: rgba(18, 20, 23, 0.8);
+            --text-main: #F3F4F6;
+            --text-muted: #9CA3AF;
+            --accent-cyan: #00E5FF;
+            --accent-amber: #FFB800;
+            --border: rgba(255, 255, 255, 0.05);
+            --grid-line: rgba(0, 229, 255, 0.05);
+            --shadow: 0 20px 40px rgba(0,0,0,0.5);
+            --anim-glow-cyan: rgba(0, 229, 255, 0.4);
+            --anim-glow-amber: rgba(255, 184, 0, 0.4);
+        }
+
+        [data-theme="light"] {
+            --bg-main: #F8FAFC;
+            --bg-panel: #FFFFFF;
+            --bg-header: rgba(248, 250, 252, 0.9);
+            --bg-overlay: rgba(15, 23, 42, 0.6);
+            --text-main: #0F172A;
+            --text-muted: #475569;
+            --accent-cyan: #0284C7;
+            --accent-amber: #D97706;
+            --border: #E2E8F0;
+            --grid-line: rgba(2, 132, 199, 0.05);
+            --shadow: 0 4px 15px rgba(15, 23, 42, 0.05);
+            --anim-glow-cyan: rgba(2, 132, 199, 0.3);
+            --anim-glow-amber: rgba(217, 119, 6, 0.3);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; scroll-padding-top: 80px; } 
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            transition: background-color 0.4s ease, color 0.4s ease;
+            overflow-x: hidden;
+        }
+
+        .grid-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background-image: 
+                linear-gradient(var(--grid-line) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: -1;
+            transition: background-image 0.4s ease;
+        }
+
+        /* === НАВИГАЦИЯ (HEADER) === */
+        header { 
+            background-color: var(--bg-header); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            position: fixed; width: 100%; top: 0; z-index: 1000; border-bottom: 1px solid var(--border); 
+            transition: 0.4s ease; 
+        }
+        
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; width: 100%; }
+        nav { display: flex; justify-content: space-between; align-items: center; height: 80px; }
+        
+        .logo { display: flex; align-items: center; gap: 15px; text-decoration: none; cursor: pointer; }
+        .logo-svg { width: 36px; height: 36px; }
+        .logo-text { font-size: 26px; font-weight: 800; color: var(--text-main); letter-spacing: -1px; transition: 0.4s; }
+        .logo-text span { color: var(--accent-cyan); }
+        
+        .nav-links { display: none; } 
+        
+        .nav-right { display: flex; align-items: center; gap: 12px; }
+
+        .icon-btn { 
+            background: var(--bg-panel); border: 1px solid var(--border); color: var(--text-main); 
+            cursor: pointer; display: flex; align-items: center; justify-content: center; 
+            border-radius: 50%; transition: 0.3s; box-shadow: var(--shadow); 
+        }
+        .theme-toggle-btn { width: 42px; height: 42px; }
+        .theme-toggle-btn:hover { border-color: var(--accent-cyan); color: var(--accent-cyan); transform: rotate(15deg); }
+        .theme-toggle-btn svg { width: 18px; height: 18px; }
+
+        .lang-dropdown { position: relative; display: inline-block; }
+        .lang-menu-btn { 
+            background: var(--bg-panel); border: 1px solid var(--border); color: var(--text-main); 
+            cursor: pointer; display: flex; align-items: center; gap: 8px; padding: 10px 18px; 
+            border-radius: 20px; font-size: 14px; font-weight: 600; transition: 0.3s; box-shadow: var(--shadow); 
+        }
+        .lang-menu-btn:hover, .lang-dropdown.active .lang-menu-btn { border-color: var(--accent-cyan); color: var(--accent-cyan); }
+        .lang-menu-btn svg { width: 18px; height: 18px; }
+        
+        .lang-dropdown-content { 
+            position: absolute; top: 100%; right: 0; margin-top: 10px; background: var(--bg-panel); 
+            border: 1px solid var(--border); border-radius: 12px; padding: 8px; display: flex; 
+            flex-direction: column; gap: 4px; box-shadow: var(--shadow); min-width: 150px; 
+            opacity: 0; visibility: hidden; transform: translateY(-10px); transition: 0.3s; z-index: 1001; 
+        }
+        .lang-dropdown-content.show { opacity: 1; visibility: visible; transform: translateY(0); }
+        .lang-dropdown-btn { 
+            background: none; border: none; color: var(--text-muted); padding: 10px 16px; 
+            text-align: left; cursor: pointer; border-radius: 8px; font-weight: 600; font-size: 13px; 
+            transition: 0.2s; display: flex; align-items: center; gap: 8px; white-space: nowrap; 
+        }
+        .lang-dropdown-btn:hover, .lang-dropdown-btn.active { background: var(--border); color: var(--accent-cyan); }
+
+        .burger-btn { background: none; border: none; color: var(--text-main); cursor: pointer; display: none; align-items: center; padding: 4px; transition: 0.3s; }
+        
+        .panel-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background: var(--bg-overlay); backdrop-filter: blur(4px); z-index: 1999; opacity: 0; visibility: hidden; transition: 0.4s; pointer-events: none;}
+        .panel-overlay.open { opacity: 1; visibility: visible; pointer-events: auto;}
+        .side-panel { position: fixed; top: 0; right: -320px; width: 320px; max-width: 100%; height: 100vh; background: var(--bg-panel); z-index: 2000; box-shadow: -10px 0 40px rgba(0,0,0,0.5); transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.4s; padding: 60px 30px; border-left: 1px solid var(--border); overflow-y: auto; }
+        .side-panel.open { right: 0; }
+        .close-btn { position: absolute; top: 24px; right: 24px; background: none; border: none; color: var(--text-muted); cursor: pointer; transition: 0.3s; }
+        .close-btn:hover { color: var(--text-main); transform: rotate(90deg); }
+        .mobile-nav-links { display: flex; flex-direction: column; gap: 24px; list-style: none; }
+        .mobile-nav-links a { color: var(--text-main); text-decoration: none; font-size: 18px; font-weight: 600; transition: 0.3s; display: block; }
+        .mobile-nav-links a:hover { color: var(--accent-cyan); }
+
+        /* === ОСНОВНОЙ КОНТЕНТ === */
+        section {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 100px 10vw 80px; 
+            border-bottom: 1px solid var(--border);
+            position: relative;
+        }
+
+        h1 { font-size: 56px; font-weight: 800; letter-spacing: -2px; margin-top: 0; margin-bottom: 20px; line-height: 1.1; transition: color 0.4s; }
+        h1 span { color: var(--accent-cyan); }
+        h2 { font-size: 42px; font-weight: 800; margin-top: 0; margin-bottom: 20px; color: var(--text-main); letter-spacing: -1px; transition: color 0.4s;}
+        p { font-size: 18px; color: var(--text-muted); max-width: 600px; line-height: 1.6; transition: color 0.4s;}
+        
+        .mono {
+            font-family: 'Fira Code', monospace;
+            color: var(--accent-cyan);
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 0;
+            margin-bottom: 20px;
+            display: block;
+            line-height: 1;
+        }
+
+        /* === СЕТКА === */
+        .case-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: stretch;
+            width: 100%;
+        }
+
+        .case-grid.hero-grid { align-items: center; }
+        .case-grid.reverse { direction: rtl; }
+        .case-grid.reverse > * { direction: ltr; }
+
+        .text-column {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .text-content {
+            display: flex;
+            flex-direction: column;
+            margin-top: -5px;
+        }
+
+        /* === УНИКАЛЬНЫЕ АНИМАЦИИ ASTRAWIRELESS === */
+       /* === УНИКАЛЬНЫЕ АНИМАЦИИ ASTRAWIRELESS === */
+.tech-animation-container {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 180px; 
+    position: relative;
+}
+
+/* 1. Топология "Звезда" (SCADA Polling) */
+.anim-topology-svg { overflow: visible; }
+.anim-topology-svg .link {
+    fill: none;
+    stroke: var(--accent-cyan);
+    opacity: 0.15;
+    stroke-width: 1.5;
+    stroke-dasharray: 4 6;
+    animation: scada-flow 20s linear infinite;
+}
+.anim-topology-svg .link.reverse {
+    animation-direction: reverse;
+}
+.anim-topology-svg .node {
+    fill: var(--bg-panel);
+    stroke: var(--accent-cyan);
+    stroke-width: 2;
+    animation: node-sync 4s infinite;
+}
+.anim-topology-svg .hub-base {
+    fill: var(--bg-panel);
+    stroke: var(--accent-amber);
+    stroke-width: 2;
+}
+.anim-topology-svg .hub-pulse {
+    fill: transparent;
+    stroke: var(--accent-amber);
+    stroke-width: 1;
+    transform-origin: 100px 100px;
+    animation: scada-poll-wave 2s infinite ease-out;
+}
+.anim-topology-svg .hub-core { fill: var(--accent-amber); }
+
+@keyframes scada-flow {
+    to { stroke-dashoffset: -200; }
+}
+@keyframes node-sync {
+    0%, 100% { stroke: var(--accent-cyan); filter: none; }
+    50% { stroke: var(--accent-amber); filter: drop-shadow(0 0 6px rgba(255, 184, 0, 0.4)); }
+}
+@keyframes scada-poll-wave {
+    0% { transform: scale(1); opacity: 0.8; }
+    100% { transform: scale(2); opacity: 0; }
+}
+
+/* 2. Канал PtP (Радиоканал) */
+.anim-ptp-bridge { position: relative; width: 160px; height: 80px; }
+.anim-ptp-bridge .tower {
+    position: absolute; bottom: 10px; width: 4px; height: 40px;
+    background: var(--text-muted); border-radius: 2px;
+}
+.anim-ptp-bridge .tower::after {
+    content: ''; position: absolute; top: -10px; left: -8px; width: 20px; height: 20px;
+    border-radius: 50%; border: 2px solid var(--accent-cyan);
+    border-right-color: transparent; border-bottom-color: transparent; transform: rotate(45deg);
+}
+.anim-ptp-bridge .t-left { left: 10px; }
+.anim-ptp-bridge .t-right { right: 10px; transform: scaleX(-1); }
+.anim-ptp-bridge .data-stream {
+    position: absolute; top: 12px; left: 25px; right: 25px; height: 8px;
+    display: flex; flex-direction: column; justify-content: space-between; overflow: hidden;
+}
+.anim-ptp-bridge .stream-line {
+    width: 100%; height: 2px; background: rgba(0, 229, 255, 0.05); position: relative;
+}
+.anim-ptp-bridge .packet {
+    position: absolute; top: 0; height: 100%; width: 50%;
+    background: linear-gradient(90deg, transparent, var(--accent-cyan), transparent);
+}
+.anim-ptp-bridge .p1 { animation: beam-tx 1.5s infinite linear; }
+.anim-ptp-bridge .p2 { animation: beam-rx 1.5s infinite linear; background: linear-gradient(90deg, transparent, var(--accent-amber), transparent); }
+
+@keyframes beam-tx { 0% { left: -50%; } 100% { left: 100%; } }
+@keyframes beam-rx { 0% { right: -50%; } 100% { right: 100%; } }
+
+/* 3. Дашборд (Кольца телеметрии) */
+.anim-dashboard { 
+    position: relative; width: 120px; height: 120px; border-radius: 50%; 
+    border: 1px solid rgba(0, 229, 255, 0.2); 
+    display: flex; align-items: center; justify-content: center;
+}
+.anim-dashboard::before { 
+    content: ''; position: absolute; width: 70px; height: 70px; border-radius: 50%;
+    border: 1px dashed rgba(0, 229, 255, 0.4); animation: rotate-slow 15s linear infinite reverse;
+}
+.anim-dashboard::after { 
+    content: ''; position: absolute; width: 30px; height: 30px; border-radius: 50%;
+    background: rgba(0, 229, 255, 0.05); border: 1px solid var(--accent-cyan);
+}
+.anim-dashboard .scanner {
+    position: absolute; width: 100%; height: 100%; border-radius: 50%;
+    border: 2px solid transparent; border-top-color: var(--accent-amber); border-bottom-color: var(--accent-amber);
+    opacity: 0.7; animation: rotate-fast 4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+.anim-dashboard .target {
+    position: absolute; width: 6px; height: 6px; background: var(--bg-panel); 
+    border: 2px solid var(--accent-amber); border-radius: 50%;
+}
+.anim-dashboard .t1 { top: 12px; left: 50%; transform: translateX(-50%); animation: telemetry-ping 2s infinite; }
+.anim-dashboard .t2 { bottom: 25px; left: 20px; animation: telemetry-ping 2s infinite 0.6s; }
+.anim-dashboard .t3 { bottom: 25px; right: 20px; animation: telemetry-ping 2s infinite 1.2s; }
+
+@keyframes rotate-slow { 100% { transform: rotate(360deg); } }
+@keyframes rotate-fast { 100% { transform: rotate(360deg); } }
+@keyframes telemetry-ping { 
+    0%, 100% { background: var(--bg-panel); box-shadow: none; } 
+    50% { background: var(--accent-amber); box-shadow: 0 0 8px var(--anim-glow-amber); } 
+}
+
+/* 4. PoE Интеграция (Индикация портов) */
+.anim-switch { position: relative; width: 140px; height: 60px; }
+.anim-switch .device {
+    position: absolute; top: 50%; left: 50%; width: 80px; height: 36px;
+    background: var(--bg-panel); border: 1px solid var(--border); border-radius: 4px;
+    transform: translate(-50%, -50%); display: flex; align-items: center; justify-content: space-evenly; z-index: 2;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+.anim-switch .sw-port { 
+    width: 10px; height: 10px; background: rgba(255,255,255,0.02); 
+    border: 1px solid rgba(255,255,255,0.1); border-radius: 2px; position: relative; 
+}
+.anim-switch .sw-port.active::before {
+    content: ''; position: absolute; top: -8px; left: 50%; transform: translateX(-50%);
+    width: 4px; height: 4px; border-radius: 50%; background: var(--accent-cyan);
+    animation: port-data-blink 0.3s infinite alternate;
+}
+.anim-switch .sw-port.power::after { 
+    content: ''; position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%);
+    width: 4px; height: 4px; border-radius: 50%; background: var(--accent-amber);
+    box-shadow: 0 0 6px var(--anim-glow-amber);
+}
+.anim-switch .cable {
+    position: absolute; bottom: 0; width: 2px; background: linear-gradient(to top, transparent, var(--border)); z-index: 1;
+}
+.anim-switch .c1 { left: 45px; height: 30px; }
+.anim-switch .c2 { right: 45px; height: 30px; }
+
+@keyframes port-data-blink { 0% { opacity: 0.1; } 100% { opacity: 1; box-shadow: 0 0 6px var(--anim-glow-cyan); } }
+
+        /* === КАРТОЧКИ === */
+        .features-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 0;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            background: var(--bg-panel);
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--accent-amber);
+            transition: background-color 0.4s, border-color 0.4s;
+        }
+        
+        .feature-item.cyan { border-left: 3px solid var(--accent-cyan); }
+
+        .feature-item div { font-size: 16px; color: var(--text-main); font-weight: 600; transition: color 0.4s;}
+        .feature-item span { display: block; font-size: 14px; color: var(--text-muted); margin-top: 6px; font-weight: 400; line-height: 1.5; transition: color 0.4s;}
+
+        /* === ФОТОГРАФИИ === */
+        .images-column {
+            display: flex;
+            width: 100%;
+        }
+
+        .image-wrapper {
+            position: relative; border-radius: 16px; overflow: hidden;
+            border: 1px solid var(--border); box-shadow: var(--shadow);
+            background: var(--bg-panel); width: 100%; height: 100%; min-height: 400px;
+            display: flex; transition: border-color 0.4s;
+        }
+
+        .image-wrapper img {
+            width: 100%; height: auto; display: block; transition: transform 0.7s ease;
+        }
+
+        .hero-img-wrapper {
+             position: relative; border-radius: 16px; overflow: hidden;
+             border: 1px solid var(--border); box-shadow: var(--shadow);
+             background: var(--bg-panel); width: 100%; height: 100%; min-height: 400px;
+             transition: border-color 0.4s;
+        }
+
+        @keyframes breathe-pan { 0% { transform: scale(1); } 100% { transform: scale(1.06); } }
+
+        .image-wrapper img, .hero-img-wrapper img {
+            width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0;
+            animation: breathe-pan 20s infinite alternate ease-in-out;
+            transition: transform 0.7s ease, filter 0.5s ease;
+        }
+        
+        .hero-img-wrapper video {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transition: transform 0.7s ease;
+        }
+
+        .image-wrapper:hover img, .hero-img-wrapper:hover img, .hero-img-wrapper:hover video { 
+            animation-play-state: paused; filter: brightness(1.1); transform: scale(1.03);
+        }
+
+        /* АДАПТИВНОСТЬ: Фиксируем порядок на мобильных */
+        @media (max-width: 968px) {
+            .case-grid, .case-grid.reverse { 
+                display: flex; 
+                flex-direction: column; 
+                gap: 40px; 
+            }
+            .text-column { order: 1; gap: 30px; }
+            .images-column { order: 2; height: auto; }
+            .image-wrapper { aspect-ratio: 16/10; min-height: 250px; height: auto; }
+            .hero-img-wrapper { aspect-ratio: 16/9; min-height: auto; }
+            
+            .tech-animation-container { display: none; }
+            h1 { font-size: 42px; }
+            h2 { font-size: 32px; }
+            section { padding: 100px 20px 40px; min-height: auto; }
+            .text-content { margin-top: 0; }
+            .burger-btn { display: flex; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="grid-bg"></div>
+
+    <header>
+        <div class="container">
+            <nav>
+                <a href="../index.html" class="logo">
+                    <svg class="logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M 10 10 H 80 V 60 H 60 V 30 H 30 V 60 H 60 V 80 H 10 Z" class="svg-fill-main" fill="currentColor" />
+                        <rect x="60" y="60" width="30" height="30" class="svg-fill-cyan" fill="var(--accent-cyan)" />
+                    </svg>
+                    <div class="logo-text">Qidri<span>x</span></div>
+                </a>
+
+                <div class="nav-right">
+                    <button class="theme-toggle-btn icon-btn" onclick="toggleTheme()" aria-label="Toggle Theme" id="themeBtn">
+                        <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                        </svg>
+                    </button>
+
+                    <div class="lang-dropdown" id="langDropdown">
+                        <button class="lang-menu-btn" onclick="toggleDropdown(event)" aria-label="Select Language">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="2" y1="12" x2="22" y2="12"></line>
+                                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1 4-10z"></path>
+                            </svg>
+                            <span id="currentLangDisplay">RU</span>
+                        </button>
+                        <div class="lang-dropdown-content" id="langContent">
+                            <button class="lang-dropdown-btn" data-lang="en" onclick="setLang('en')"><span class="lang-flag">🇬🇧</span> English</button>
+                            <button class="lang-dropdown-btn" data-lang="uz" onclick="setLang('uz')"><span class="lang-flag">🇺🇿</span> O'zbek</button>
+                            <button class="lang-dropdown-btn" data-lang="kk" onclick="setLang('kk')"><span class="lang-flag">🇰🇿</span> Қазақша</button>
+                            <button class="lang-dropdown-btn active" data-lang="ru" onclick="setLang('ru')"><span class="lang-flag">🇷🇺</span> Русский</button>
+                        </div>
+                    </div>
+                    
+                    <button class="burger-btn" onclick="toggleMenu()" aria-label="Menu">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="3" y1="12" x2="21" y2="12"></line>
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <line x1="3" y1="18" x2="21" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <div class="panel-overlay" id="panelOverlay" onclick="toggleMenu()"></div>
+    <div class="side-panel" id="sidePanel">
+        <button class="close-btn" onclick="toggleMenu()">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+        </button>
+        <div class="panel-content">
+            <ul class="mobile-nav-links">
+                <li><a href="../index.html" onclick="toggleMenu()" data-ru="Вернуться на главную" data-en="Back to Home" data-kk="Басты бетке оралу" data-uz="Asosiy sahifaga qaytish">Вернуться на главную</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- КЕЙС: Главный экран -->
+    <section>
+        <div class="case-grid hero-grid">
+            <div class="text-column" style="max-width: 800px;">
+                <div class="text-content" style="margin-top: 0;">
+                    <span class="mono" data-ru="РЕАЛИЗОВАННЫЙ ПРОЕКТ" data-en="IMPLEMENTED PROJECT" data-kk="ІСКЕ АСЫРЫЛҒАН ЖОБА" data-uz="AMALGA OSHIRILGAN LOYIHA">РЕАЛИЗОВАННЫЙ ПРОЕКТ</span>
+                    <h1 data-ru="Внедрение SCADA и телеметрии" data-en="SCADA and Telemetry Implementation" data-kk="SCADA және телеметрияны енгізу" data-uz="SCADA va telemetriyani joriy etish">Внедрение SCADA и телеметрии</h1>
+                    <p style="font-size: 24px; color: var(--text-main); margin-bottom: 20px;" data-ru="Развертывание сети широкополосного доступа и систем нижнего уровня 6/10 кВ." data-en="Deployment of a broadband access network and lower-level 6/10 kV systems." data-kk="Кең жолақты қолжетімділік желісін және төменгі деңгейдегі 6/10 кВ жүйелерін орналастыру." data-uz="Keng polosali ulanish tarmog'i va pastki darajadagi 6/10 kV tizimlarini joylashtirish.">Развертывание сети широкополосного доступа и систем нижнего уровня 6/10 кВ.</p>
+                    <p style="margin-bottom: 0;" data-ru="Обеспечение дистанционного контроля, сбора данных телеметрии и управления режимами работы электроустановок в рамках масштабной инвестиционной программы 2021-2026 гг." data-en="Ensuring remote monitoring, telemetry data collection, and control of electrical installation operating modes within a large-scale investment program 2021-2026." data-kk="2021-2026 жылдарға арналған ауқымды инвестициялық бағдарлама аясында электр қондырғыларының жұмыс режимдерін қашықтықтан бақылауды, телеметриялық деректерді жинауды және басқаруды қамтамасыз ету." data-uz="2021-2026 yillarga mo'ljallangan yirik investitsiya dasturi doirasida elektr qurilmalarining ish rejimlarini masofadan nazorat qilish, telemetriya ma'lumotlarini yig'ish va boshqarishni ta'minlash.">Обеспечение дистанционного контроля, сбора данных телеметрии и управления режимами работы электроустановок в рамках масштабной инвестиционной программы 2021-2026 гг.</p>
+                </div>
+            </div>
+            <div class="images-column">
+                <div class="hero-img-wrapper">
+                    <img src="1.png" alt="SCADA Project Karaganda">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Шаг 01 -->
+    <section id="step-1">
+        <div class="case-grid reverse">
+            <div class="text-column">
+                <div class="text-content">
+                    <span class="mono" data-ru="Шаг 01. Инфраструктура" data-en="Step 01. Infrastructure" data-kk="Қадам 01. Инфрақұрылым" data-uz="Qadam 01. Infratuzilma">Шаг 01. Инфраструктура</span>
+                    <h2 data-ru="Топология сети" data-en="Network Topology" data-kk="Желі топологиясы" data-uz="Tarmoq topologiyasi">Топология сети</h2>
+                    <p style="margin-bottom: 0;" data-ru="Беспроводная сеть топологии «звезда» для передачи данных между объектами инфраструктуры 15 сетевых районов и центральным узлом управления." data-en="A 'star' topology wireless network for data transmission between infrastructure facilities in 15 network districts and the central control node." data-kk="15 желілік ауданның инфрақұрылымдық объектілері мен орталық басқару торабы арасында деректерді тасымалдауға арналған «жұлдыз» топологиясының сымсыз желісі." data-uz="15 ta tarmoq tumanlari infratuzilma ob'ektlari va markaziy boshqaruv tuguni o'rtasida ma'lumotlarni uzatish uchun 'yulduz' topologiyali simsiz tarmoq.">Беспроводная сеть топологии «звезда» для передачи данных между объектами инфраструктуры 15 сетевых районов и центральным узлом управления.</p>
+                </div>
+                
+                <div class="tech-animation-container">
+                    <svg class="anim-topology-svg" viewBox="0 0 200 200" width="160" height="160">
+                        <path d="M 100 100 L 40 40" class="link l1" />
+                        <path d="M 100 100 L 160 40" class="link l2" />
+                        <path d="M 100 100 L 30 130" class="link l3" />
+                        <path d="M 100 100 L 170 130" class="link l4" />
+                        <path d="M 100 100 L 100 180" class="link l5" />
+                        <circle cx="40" cy="40" r="6" class="node" />
+                        <circle cx="160" cy="40" r="6" class="node" />
+                        <circle cx="30" cy="130" r="6" class="node" />
+                        <circle cx="170" cy="130" r="6" class="node" />
+                        <circle cx="100" cy="180" r="6" class="node" />
+                        <circle cx="100" cy="100" r="16" class="hub-base" />
+                        <circle cx="100" cy="100" r="16" class="hub-pulse" />
+                        <circle cx="100" cy="100" r="6" class="hub-core" />
+                    </svg>
+                </div>
+
+                <div class="features-list">
+                    <div class="feature-item cyan">
+                        <div><span style="font-size: 16px; color: var(--text-main); font-weight: 600; display: inline;" data-ru="Базовые станции" data-en="Base Stations" data-kk="Базалық станциялар" data-uz="Baza stantsiyalari">Базовые станции</span>
+                            <span data-ru="30 базовых станций, обеспечивающих уверенное покрытие объектов электросетей заказчика." data-en="30 base stations providing reliable coverage of the customer's power grid facilities." data-kk="Тапсырыс берушінің электр желісі объектілерін сенімді қамтуды қамтамасыз ететін 30 базалық станция." data-uz="Buyurtmachining elektr tarmog'i ob'ektlarini ishonchli qamrab olishni ta'minlaydigan 30 ta baza stantsiyasi.">30 базовых станций, обеспечивающих уверенное покрытие объектов электросетей заказчика.</span>
+                        </div>
+                    </div>
+                    <div class="feature-item amber">
+                        <div><span style="font-size: 16px; color: var(--text-main); font-weight: 600; display: inline;" data-ru="Абонентские узлы" data-en="Subscriber Nodes" data-kk="Абоненттік тораптар" data-uz="Abonent tugunlari">Абонентские узлы</span>
+                            <span data-ru="1847 абонентских станций, установленных непосредственно на объектах инфраструктуры." data-en="1847 subscriber stations installed directly at the infrastructure facilities." data-kk="Тікелей инфрақұрылым объектілерінде орнатылған 1847 абоненттік станция." data-uz="Bevosita infratuzilma ob'ektlarida o'rnatilgan 1847 ta abonent stantsiyalari.">1847 абонентских станций, установленных непосредственно на объектах инфраструктуры.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="images-column">
+                <div class="image-wrapper">
+                    <img src="2.png" alt="Topology Scheme">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Шаг 02 -->
+    <section id="step-2">
+        <div class="case-grid">
+            <div class="text-column">
+                <div class="text-content">
+                    <span class="mono" data-ru="Шаг 02. Технологии" data-en="Step 02. Technologies" data-kk="Қадам 02. Технологиялар" data-uz="Qadam 02. Texnologiyalar">Шаг 02. Технологии</span>
+                    <h2 data-ru="Оборудование и каналы" data-en="Equipment and channels" data-kk="Жабдықтар мен арналар" data-uz="Uskunalar va kanallar">Оборудование и каналы</h2>
+                    <p style="margin-bottom: 0;" data-ru="Развертывание магистральных и секторных каналов связи на базе решений Astrawireless в рабочем диапазоне 3,1-3,4 ГГц." data-en="Deployment of backbone and sector communication channels based on Astrawireless solutions in the 3.1-3.4 GHz operating range." data-kk="3,1-3,4 ГГц жұмыс диапазонында Astrawireless шешімдері негізінде магистральдық және секторлық байланыс арналарын орналастыру." data-uz="3.1-3.4 GGts ishchi diapazonida Astrawireless yechimlari asosida magistral va sektorli aloqa kanallarini joylashtirish.">Развертывание магистральных и секторных каналов связи на базе решений Astrawireless в рабочем диапазоне 3,1-3,4 ГГц.</p>
+                </div>
+
+                <div class="tech-animation-container">
+                    <div class="anim-ptp-bridge">
+                        <div class="tower t-left"></div>
+                        <div class="data-stream">
+                            <div class="stream-line"><div class="packet p1"></div></div>
+                            <div class="stream-line"><div class="packet p2"></div></div>
+                        </div>
+                        <div class="tower t-right"></div>
+                    </div>
+                </div>
+                
+                <div class="features-list">
+                    <div class="feature-item cyan">
+                        <div><span style="font-size: 16px; color: var(--text-main); font-weight: 600; display: inline;" data-ru="Магистральные каналы" data-en="Backbone channels" data-kk="Магистральдық арналар" data-uz="Magistral kanallar">Магистральные каналы</span>
+                            <span data-ru="Оборудование PtP XG и XG 1000 обеспечивает пропускную способность передачи данных до 1000 Мбит/с." data-en="PtP XG and XG 1000 equipment provides data transmission bandwidth up to 1000 Mbps." data-kk="PtP XG және XG 1000 жабдығы 1000 Мбит/с дейін деректерді беру мүмкіндігін қамтамасыз етеді." data-uz="PtP XG va XG 1000 uskunalari 1000 Mbit/s gacha ma'lumotlarni uzatish imkoniyatini ta'minlaydi.">Оборудование PtP XG и XG 1000 обеспечивает пропускную способность передачи данных до 1000 Мбит/с.</span>
+                        </div>
+                    </div>
+                    <div class="feature-item cyan">
+                        <div><span style="font-size: 16px; color: var(--text-main); font-weight: 600; display: inline;" data-ru="Секторная часть сети" data-en="Sector part of the network" data-kk="Желінің секторлық бөлігі" data-uz="Tarmoqning sektor qismi">Секторная часть сети</span>
+                            <span data-ru="Оборудование R5000 с интегрированными антеннами для надежной организации радиодоступа на удаленных объектах." data-en="R5000 equipment with integrated antennas for reliable radio access organization at remote sites." data-kk="Шалғайдағы объектілерде радиодоступты сенімді ұйымдастыруға арналған кіріктірілген антенналары бар R5000 жабдығы." data-uz="Uzoq ob'ektlarda radiodastupni ishonchli tashkil etish uchun o'rnatilgan antennali R5000 uskunasi.">Оборудование R5000 с интегрированными антеннами для надежной организации радиодоступа на удаленных объектах.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="images-column">
+                 <div class="image-wrapper">
+                    <img src="4.png" alt="Astrawireless Equipment">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Шаг 03 -->
+    <section id="step-3">
+        <div class="case-grid reverse">
+            <div class="text-column">
+                <div class="text-content">
+                    <span class="mono" data-ru="Шаг 03. Преимущества" data-en="Step 03. Advantages" data-kk="Қадам 03. Артықшылықтар" data-uz="Qadam 03. Afzalliklar">Шаг 03. Преимущества</span>
+                    <h2 data-ru="Ключевые показатели" data-en="Key performance indicators" data-kk="Негізгі көрсеткіштер" data-uz="Asosiy ko'rsatkichlar">Ключевые показатели</h2>
+                    <p style="margin-bottom: 0;" data-ru="Решение Astrawireless было выбрано для обеспечения стабильной беспроводной передачи данных SCADA с большим количеством удаленных объектов." data-en="The Astrawireless solution was chosen to ensure stable wireless SCADA data transmission with a large number of remote sites." data-kk="Astrawireless шешімі көптеген қашықтағы объектілері бар тұрақты сымсыз SCADA деректерін тасымалдауды қамтамасыз ету үшін таңдалды." data-uz="Astrawireless yechimi ko'p sonli uzoq ob'ektlar bilan barqaror simsiz SCADA ma'lumotlarini uzatishni ta'minlash uchun tanlangan.">Решение Astrawireless было выбрано для обеспечения стабильной беспроводной передачи данных SCADA с большим количеством удаленных объектов.</p>
+                </div>
+
+                <div class="tech-animation-container">
+                    <div class="anim-dashboard">
+                        <div class="scanner"></div>
+                        <div class="target t1"></div>
+                        <div class="target t2"></div>
+                        <div class="target t3"></div>
+                    </div>
+                </div>
+                
+                <div class="features-list">
+                    <div class="feature-item amber">
+                        <div><span style="font-size: 16px; color: var(--text-main); font-weight: 600; display: inline;" data-ru="Высокая производительность" data-en="High performance" data-kk="Жоғары өнімділік" data-uz="Yuqori mahsuldorlik">Высокая производительность</span>
+                            <span data-ru="Пропускная способность до 240-300 Мбит/с на один сектор базовой станции для мгновенной выгрузки телеметрии." data-en="Throughput up to 240-300 Mbps per base station sector for instant telemetry offloading." data-kk="Телеметрияны лезде түсіру үшін базалық станцияның бір секторына 240-300 Мбит/с дейін өткізу қабілеті." data-uz="Telemetriyani zudlik bilan tushirish uchun baza stantsiyasining bitta sektoriga 240-300 Mbit/s gacha o'tkazuvchanlik.">Пропускная способность до 240-300 Мбит/с на один сектор базовой станции для мгновенной выгрузки телеметрии.</span>
+                        </div>
+                    </div>
+                    <div class="feature-item amber">
+                        <div><span style="font-size: 16px; color: var(--text-main); font-weight: 600; display: inline;" data-ru="Работа на больших расстояниях" data-en="Long distance operation" data-kk="Үлкен қашықтықта жұмыс істеу" data-uz="Uzoq masofalarda ishlash">Работа на больших расстояниях</span>
+                            <span data-ru="Связь от базовой станции пробивает до 25+ км, а от компактной абонентской станции — до 12 км." data-en="Communication from the base station penetrates up to 25+ km, and from a compact subscriber station — up to 12 km." data-kk="Базалық станциядан байланыс 25+ км-ге дейін, ал ықшам абоненттік станциядан — 12 км-ге дейін жетеді." data-uz="Baza stantsiyasidan aloqa 25+ km gacha, ixcham abonent stantsiyasidan esa - 12 km gacha yetib boradi.">Связь от базовой станции пробивает до 25+ км, а от компактной абонентской станции — до 12 км.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="images-column">
+                <div class="image-wrapper">
+                    <img src="5.png" alt="Map coverage">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Шаг 04 -->
+    <section id="step-4">
+        <div class="case-grid">
+            <div class="text-column">
+                <div class="text-content">
+                    <span class="mono" data-ru="Шаг 04. Интеграция" data-en="Step 04. Integration" data-kk="Қадам 04. Интеграция" data-uz="Qadam 04. Integratsiya">Шаг 04. Интеграция</span>
+                    <h2 data-ru="Масштабируемость и монтаж" data-en="Scalability and Installation" data-kk="Масштабталу және монтаждау" data-uz="Masshtablash va o'rnatish">Масштабируемость и монтаж</h2>
+                    <p style="margin-bottom: 0;" data-ru="Архитектура позволяет подключать новые объекты электросети и расширять зоны покрытия без перестройки всей инфраструктуры, сохраняя совместимость с будущим оборудованием." data-en="The architecture allows connecting new power grid facilities and expanding coverage areas without rebuilding the entire infrastructure, maintaining compatibility with future equipment." data-kk="Сәулет барлық инфрақұрылымды қайта құрмай, болашақ жабдықтармен үйлесімділікті сақтай отырып, жаңа электр желісі нысандарын қосуға және қамту аймақтарын кеңейтуге мүмкіндік береді." data-uz="Arxitektura butun infratuzilmani qayta qurmasdan, kelajakdagi uskunalar bilan moslikni saqlab, yangi elektr tarmog'i ob'ektlarini ulash va qamrov zonalarini kengaytirish imkonini beradi.">Архитектура позволяет подключать новые объекты электросети и расширять зоны покрытия без перестройки всей инфраструктуры, сохраняя совместимость с будущим оборудованием.</p>
+                </div>
+
+                <div class="tech-animation-container">
+                    <div class="anim-switch">
+                        <div class="cable c1"></div>
+                        <div class="cable c2"></div>
+                        <div class="device">
+                            <div class="sw-port active"></div>
+                            <div class="sw-port active power"></div>
+                            <div class="sw-port"></div>
+                            <div class="sw-port active"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="features-list">
+                    <div class="feature-item cyan">
+                        <div><span style="font-size: 16px; color: var(--text-main); font-weight: 600; display: inline;" data-ru="Гибкое планирование" data-en="Flexible planning" data-kk="Икемді жоспарлау" data-uz="Moslashuvchan rejalashtirish">Гибкое планирование</span>
+                            <span data-ru="Настройка секторов на разные частоты существенно снижает взаимное влияние радиоканалов друг на друга." data-en="Setting sectors to different frequencies significantly reduces the mutual influence of radio channels on each other." data-kk="Секторларды әртүрлі жиіліктерге баптау радиоарналардың бір-біріне өзара әсерін айтарлықтай төмендетеді." data-uz="Sektorlarni turli chastotalarga sozlash radiokanallarning bir-biriga o'zaro ta'sirini sezilarli darajada kamaytiradi.">Настройка секторов на разные частоты существенно снижает взаимное влияние радиоканалов друг на друга.</span>
+                        </div>
+                    </div>
+                    <div class="feature-item cyan">
+                        <div><span style="font-size: 16px; color: var(--text-main); font-weight: 600; display: inline;" data-ru="Удобство интеграции" data-en="Ease of integration" data-kk="Интеграцияның ыңғайлылығы" data-uz="Integratsiya qulayligi">Удобство интеграции</span>
+                            <span data-ru="Поддержка PoE позволяет передавать питание и данные по одному Ethernet-кабелю, ускоряя процесс монтажа." data-en="PoE support allows power and data transmission over a single Ethernet cable, speeding up the installation process." data-kk="PoE қолдауы монтаждау процесін тездетіп, бір Ethernet кабелі арқылы қуат пен деректерді жіберуге мүмкіндік береді." data-uz="PoE qo'llab-quvvatlashi montaj jarayonini tezlashtirib, bitta Ethernet kabeli orqali quvvat va ma'lumotlarni uzatish imkonini beradi.">Поддержка PoE позволяет передавать питание и данные по одному Ethernet-кабелю, ускоряя процесс монтажа.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="images-column">
+                <div class="image-wrapper">
+                    <img src="6.png" alt="Installation on site">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        let currentLang = 'ru';
+
+        function toggleDropdown(event) {
+            if(event) event.stopPropagation();
+            const content = document.getElementById('langContent');
+            if(content.style.opacity === '1') {
+                content.style.opacity = '0';
+                content.style.visibility = 'hidden';
+                content.style.transform = 'translateY(-10px)';
+            } else {
+                content.style.opacity = '1';
+                content.style.visibility = 'visible';
+                content.style.transform = 'translateY(0)';
+            }
+        }
+
+        function setLang(lang) {
+            currentLang = lang;
+            localStorage.setItem('qidrix_lang', lang);
+            
+            document.getElementById('currentLangDisplay').innerText = lang.toUpperCase();
+            const content = document.getElementById('langContent');
+            content.style.opacity = '0';
+            content.style.visibility = 'hidden';
+            content.style.transform = 'translateY(-10px)';
+            
+            document.querySelectorAll('[data-' + lang + ']').forEach(el => {
+                if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+                    el.placeholder = el.getAttribute('data-' + lang);
+                } else {
+                    el.innerHTML = el.getAttribute('data-' + lang);
+                }
+            });
+            
+            document.querySelectorAll('.lang-dropdown-btn').forEach(btn => {
+                const isMatch = btn.getAttribute('data-lang') === lang;
+                if(isMatch) {
+                    btn.style.background = 'var(--border)';
+                    btn.style.color = 'var(--accent-cyan)';
+                } else {
+                    btn.style.background = 'none';
+                    btn.style.color = 'var(--text-muted)';
+                }
+            });
+        }
+
+        function toggleTheme() {
+            const body = document.documentElement;
+            const currentTheme = body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            body.setAttribute('data-theme', newTheme);
+            localStorage.setItem('qidrix_theme', newTheme);
+            updateThemeIcon(newTheme);
+        }
+
+        function updateThemeIcon(theme) {
+            const themeIcon = document.getElementById('themeIcon');
+            if (theme === 'light') {
+                themeIcon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>';
+            } else {
+                themeIcon.innerHTML = '<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>';
+            }
+        }
+
+        function toggleMenu() {
+            document.getElementById('sidePanel').classList.toggle('open');
+            document.getElementById('panelOverlay').classList.toggle('open');
+            document.body.style.overflow = document.getElementById('sidePanel').classList.contains('open') ? 'hidden' : '';
+        }
+
+        window.onclick = function(event) {
+            if (!event.target.closest('.lang-dropdown')) {
+                const content = document.getElementById('langContent');
+                if(content) {
+                    content.style.opacity = '0';
+                    content.style.visibility = 'hidden';
+                    content.style.transform = 'translateY(-10px)';
+                }
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('qidrix_theme');
+            const currentTheme = savedTheme ? savedTheme : 'dark';
+            document.documentElement.setAttribute('data-theme', currentTheme);
+            updateThemeIcon(currentTheme);
+
+            const savedLang = localStorage.getItem('qidrix_lang');
+            if (savedLang) {
+                setLang(savedLang);
+            } else {
+                setLang('ru');
+            }
+        });
+    </script>
+</body>
+</html>
