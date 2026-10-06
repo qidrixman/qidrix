@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Qidrix | Кейс: Цифровой карьер</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    
+    <script>
+        if ('scrollRestoration' in history) {
+            history.scrollRestoration = 'manual';
+        }
+        if (window.location.hash) {
+            window.history.replaceState(null, null, window.location.pathname);
+        }
+        window.scrollTo(0, 0);
+    </script>
+
+    <style>
+        /* === ТЕМНЫЕ И СВЕТЛЫЕ ПЕРЕМЕННЫЕ === */
+        :root, [data-theme="dark"] {
+            --bg-main: #121417;
+            --bg-panel: #1E2126;
+            --bg-header: rgba(18, 20, 23, 0.85);
+            --bg-overlay: rgba(18, 20, 23, 0.8);
+            --text-main: #F3F4F6;
+            --text-muted: #9CA3AF;
+            --accent-cyan: #00E5FF;
+            --accent-amber: #FFB800;
+            --border: rgba(255, 255, 255, 0.05);
+            --grid-line: rgba(0, 229, 255, 0.05);
+            --shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+
+        [data-theme="light"] {
+            --bg-main: #F8FAFC;
+            --bg-panel: #FFFFFF;
+            --bg-header: rgba(248, 250, 252, 0.9);
+            --bg-overlay: rgba(15, 23, 42, 0.6);
+            --text-main: #0F172A;
+            --text-muted: #475569;
+            --accent-cyan: #0284C7;
+            --accent-amber: #D97706;
+            --border: #E2E8F0;
+            --grid-line: rgba(2, 132, 199, 0.05);
+            --shadow: 0 4px 15px rgba(15, 23, 42, 0.05);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { 
+            scroll-behavior: smooth; 
+            scroll-padding-top: 80px; 
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            transition: background-color 0.4s ease, color 0.4s ease;
+            overflow-x: hidden;
+        }
+
+        .grid-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background-image: 
+                linear-gradient(var(--grid-line) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: -1;
+            transition: background-image 0.4s ease;
+        }
+
+        /* === НАВИГАЦИЯ (HEADER) === */
+        header { 
+            background-color: var(--bg-header); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            position: fixed; width: 100%; top: 0; z-index: 1000; border-bottom: 1px solid var(--border); 
+            transition: 0.4s ease; 
+        }
+        
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; width: 100%; }
+        nav { display: flex; justify-content: space-between; align-items: center; height: 80px; }
+        
+        .logo { display: flex; align-items: center; gap: 15px; text-decoration: none; cursor: pointer; }
+        .logo-svg { width: 36px; height: 36px; }
+        .logo-text { font-size: 26px; font-weight: 800; color: var(--text-main); letter-spacing: -1px; transition: 0.4s; }
+        .logo-text span { color: var(--accent-cyan); }
+        
+        /* Ссылок меню здесь нет, так как это внутренняя страница кейса */
+        .nav-links { display: none; } 
+        
+        .nav-right { display: flex; align-items: center; gap: 12px; }
+
+        .icon-btn { 
+            background: var(--bg-panel); border: 1px solid var(--border); color: var(--text-main); 
+            cursor: pointer; display: flex; align-items: center; justify-content: center; 
+            border-radius: 50%; transition: 0.3s; box-shadow: var(--shadow); 
+        }
+        .theme-toggle-btn { width: 42px; height: 42px; }
+        .theme-toggle-btn:hover { border-color: var(--accent-cyan); color: var(--accent-cyan); transform: rotate(15deg); }
+        .theme-toggle-btn svg { width: 18px; height: 18px; }
+
+        .lang-dropdown { position: relative; display: inline-block; }
+        .lang-menu-btn { 
+            background: var(--bg-panel); border: 1px solid var(--border); color: var(--text-main); 
+            cursor: pointer; display: flex; align-items: center; gap: 8px; padding: 10px 18px; 
+            border-radius: 20px; font-size: 14px; font-weight: 600; transition: 0.3s; box-shadow: var(--shadow); 
+        }
+        .lang-menu-btn:hover, .lang-dropdown.active .lang-menu-btn { border-color: var(--accent-cyan); color: var(--accent-cyan); }
+        .lang-menu-btn svg { width: 18px; height: 18px; }
+        
+        .lang-dropdown-content { 
+            position: absolute; top: 100%; right: 0; margin-top: 10px; background: var(--bg-panel); 
+            border: 1px solid var(--border); border-radius: 12px; padding: 8px; display: flex; 
+            flex-direction: column; gap: 4px; box-shadow: var(--shadow); min-width: 150px; 
+            opacity: 0; visibility: hidden; transform: translateY(-10px); transition: 0.3s; z-index: 1001; 
+        }
+        .lang-dropdown-content.show { opacity: 1; visibility: visible; transform: translateY(0); }
+        .lang-dropdown-btn { 
+            background: none; border: none; color: var(--text-muted); padding: 10px 16px; 
+            text-align: left; cursor: pointer; border-radius: 8px; font-weight: 600; font-size: 13px; 
+            transition: 0.2s; display: flex; align-items: center; gap: 8px; white-space: nowrap; 
+        }
+        .lang-dropdown-btn:hover, .lang-dropdown-btn.active { background: var(--border); color: var(--accent-cyan); }
+
+        .burger-btn { background: none; border: none; color: var(--text-main); cursor: pointer; display: none; align-items: center; padding: 4px; transition: 0.3s; }
+        
+        /* Мобильное меню */
+        .panel-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background: var(--bg-overlay); backdrop-filter: blur(4px); z-index: 1999; opacity: 0; visibility: hidden; transition: 0.4s; pointer-events: none;}
+        .panel-overlay.open { opacity: 1; visibility: visible; pointer-events: auto;}
+        .side-panel { position: fixed; top: 0; right: -320px; width: 320px; max-width: 100%; height: 100vh; background: var(--bg-panel); z-index: 2000; box-shadow: -10px 0 40px rgba(0,0,0,0.5); transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.4s; padding: 60px 30px; border-left: 1px solid var(--border); overflow-y: auto; }
+        .side-panel.open { right: 0; }
+        .close-btn { position: absolute; top: 24px; right: 24px; background: none; border: none; color: var(--text-muted); cursor: pointer; transition: 0.3s; }
+        .close-btn:hover { color: var(--text-main); transform: rotate(90deg); }
+        .mobile-nav-links { display: flex; flex-direction: column; gap: 24px; list-style: none; }
+        .mobile-nav-links a { color: var(--text-main); text-decoration: none; font-size: 18px; font-weight: 600; transition: 0.3s; display: block; }
+        .mobile-nav-links a:hover { color: var(--accent-cyan); }
+
+        /* === ОСНОВНОЙ КОНТЕНТ === */
+        section {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 100px 10vw 80px; 
+            border-bottom: 1px solid var(--border);
+            position: relative;
+        }
+
+        h1 { font-size: 64px; font-weight: 800; letter-spacing: -2px; margin-bottom: 20px; line-height: 1.1; transition: color 0.4s; }
+        h1 span { color: var(--accent-cyan); }
+        h2 { font-size: 42px; font-weight: 800; margin-bottom: 20px; color: var(--text-main); letter-spacing: -1px; transition: color 0.4s; }
+        p { font-size: 18px; color: var(--text-muted); max-width: 600px; line-height: 1.6; transition: color 0.4s; }
+        
+        .mono {
+            font-family: 'Fira Code', monospace;
+            color: var(--accent-cyan);
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            display: block;
+            transition: color 0.4s;
+        }
+
+        .case-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: stretch;
+            width: 100%;
+        }
+
+        .case-grid.reverse {
+            direction: rtl;
+        }
+        .case-grid.reverse > * {
+            direction: ltr;
+        }
+
+        .case-text {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .features-list {
+            margin-top: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            background: var(--bg-panel);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--accent-amber);
+            transition: background-color 0.4s, border-color 0.4s;
+        }
+        
+        .feature-item.cyan {
+            border-left: 3px solid var(--accent-cyan);
+        }
+
+        .feature-item div {
+            font-size: 15px;
+            color: var(--text-main);
+            font-weight: 600;
+            transition: color 0.4s;
+        }
+
+        .feature-item span {
+            display: block;
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-top: 5px;
+            font-weight: 400;
+            transition: color 0.4s;
+        }
+
+        .images-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            height: 100%;
+        }
+
+        .images-group {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            height: 100%;
+        }
+
+        .image-wrapper {
+            position: relative;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            background: var(--bg-panel);
+            width: 100%;
+            height: 100%;
+            transition: border-color 0.4s;
+        }
+
+        .hero-video-wrapper {
+            position: relative;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            background: var(--bg-panel);
+            width: 100%;
+            aspect-ratio: 4/3;
+            transition: border-color 0.4s;
+        }
+
+        .hero-video-wrapper video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+        }
+
+        .images-group .image-wrapper {
+            flex: 1;
+        }
+
+        .image-wrapper img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.7s ease;
+        }
+
+        .image-wrapper:hover img {
+            transform: scale(1.03);
+        }
+
+        .img-badge {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #F3F4F6;
+            font-family: 'Fira Code', monospace;
+            font-size: 12px;
+            z-index: 10;
+        }
+
+        @media (max-width: 968px) {
+            .case-grid, .case-grid.reverse {
+                grid-template-columns: 1fr;
+                direction: ltr;
+                align-items: start;
+            }
+            .images-row {
+                grid-template-columns: 1fr;
+            }
+            .image-wrapper {
+                aspect-ratio: 16/10;
+                height: auto;
+            }
+            .hero-video-wrapper {
+                aspect-ratio: 16/9;
+            }
+            h1 { font-size: 42px; }
+            h2 { font-size: 32px; }
+            section { padding: 100px 20px 40px; min-height: auto; }
+            .burger-btn { display: flex; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="grid-bg"></div>
+
+    <header>
+        <div class="container">
+            <nav>
+                <a href="../index.html" class="logo">
+                    <svg class="logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M 10 10 H 80 V 60 H 60 V 30 H 30 V 60 H 60 V 80 H 10 Z" fill="currentColor" class="svg-fill-main" />
+                        <rect x="60" y="60" width="30" height="30" fill="var(--accent-cyan)" />
+                    </svg>
+                    <div class="logo-text">Qidri<span>x</span></div>
+                </a>
+
+                <div class="nav-right">
+                    <button class="theme-toggle-btn icon-btn" onclick="toggleTheme()" aria-label="Toggle Theme" id="themeBtn">
+                        <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                        </svg>
+                    </button>
+
+                    <div class="lang-dropdown" id="langDropdown">
+                        <button class="lang-menu-btn" onclick="toggleDropdown(event)" aria-label="Select Language">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="2" y1="12" x2="22" y2="12"></line>
+                                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1 4-10z"></path>
+                            </svg>
+                            <span id="currentLangDisplay">RU</span>
+                        </button>
+                        <div class="lang-dropdown-content" id="langContent">
+                            <button class="lang-dropdown-btn" data-lang="en" onclick="setLang('en')"><span class="lang-flag">🇬🇧</span> English</button>
+                            <button class="lang-dropdown-btn" data-lang="uz" onclick="setLang('uz')"><span class="lang-flag">🇺🇿</span> O'zbek</button>
+                            <button class="lang-dropdown-btn" data-lang="kk" onclick="setLang('kk')"><span class="lang-flag">🇰🇿</span> Қазақша</button>
+                            <button class="lang-dropdown-btn active" data-lang="ru" onclick="setLang('ru')"><span class="lang-flag">🇷🇺</span> Русский</button>
+                        </div>
+                    </div>
+                    
+                    <button class="burger-btn" onclick="toggleMenu()" aria-label="Menu">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="3" y1="12" x2="21" y2="12"></line>
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <line x1="3" y1="18" x2="21" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <div class="panel-overlay" id="panelOverlay" onclick="toggleMenu()"></div>
+    <div class="side-panel" id="sidePanel">
+        <button class="close-btn" onclick="toggleMenu()">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+        </button>
+        <div class="panel-content">
+            <ul class="mobile-nav-links">
+                <li><a href="../index.html" onclick="toggleMenu()" data-ru="Вернуться на главную" data-en="Back to Home" data-kk="Басты бетке оралу" data-uz="Asosiy sahifaga qaytish">Вернуться на главную</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <section>
+        <div class="case-grid">
+            <div class="case-text" style="max-width: 800px;">
+                <span class="mono" data-ru="PROJECT CASE STUDY" data-en="PROJECT CASE STUDY" data-kk="ЖОБА КЕЙСІ" data-uz="LOYIHA KEYS">PROJECT CASE STUDY</span>
+                <h1 data-ru="Оцифровка спецтехники в горных условиях" data-en="Digitization of special equipment in mining conditions" data-kk="Тау-кен жағдайында арнайы техниканы цифрландыру" data-uz="Tog'-kon sharoitida maxsus texnikani raqamlashtirish">Оцифровка спецтехники в горных условиях</h1>
+                <p style="font-size: 24px; color: var(--text-main); margin-bottom: 20px;" data-ru="Интеграция систем АСУ ГТК, высокоточного позиционирования и связи для тяжелой карьерной техники." data-en="Integration of ACS MTC, high-precision positioning and communication systems for heavy mining equipment." data-kk="Ауыр карьерлік техника үшін ТКК АБЖ, жоғары дәлдіктегі позициялау және байланыс жүйелерін біріктіру." data-uz="Og'ir kon texnikasi uchun ATB, yuqori aniqlikdagi joylashuv va aloqa tizimlarini integratsiyalash.">Интеграция систем АСУ ГТК, высокоточного позиционирования и связи для тяжелой карьерной техники.</p>
+                <p data-ru="Комплексный подход к диспетчеризации горнорудного транспорта. От установки автономных ретрансляторов до монтажа бортовых компьютеров и V2X антенн. Связываем оборудование с единым центром управления предприятием." data-en="A comprehensive approach to the dispatching of mining transport. From the installation of autonomous repeaters to the mounting of onboard computers and V2X antennas. We connect the equipment to a single enterprise control center." data-kk="Тау-кен көлігін диспетчерлендірудің кешенді тәсілі. Автономды ретрансляторларды орнатудан бастап борттық компьютерлер мен V2X антенналарын монтаждауға дейін. Біз жабдықты кәсіпорынның бірыңғай басқару орталығымен байланыстырамыз." data-uz="Tog'-kon transportini dispetcherlashtirishga kompleks yondashuv. Avtonom retranslyatorlarni o'rnatishdan tortib, bort kompyuterlari va V2X antennalarini montaj qilishgacha. Uskunalarni korxonaning yagona boshqaruv markaziga ulaymiz.">Комплексный подход к диспетчеризации горнорудного транспорта. От установки автономных ретрансляторов до монтажа бортовых компьютеров и V2X антенн. Связываем оборудование с единым центром управления предприятием.</p>
+            </div>
+            <div class="hero-video-wrapper">
+                <video src="video.mp4" autoplay loop muted playsinline oncanplay="this.playbackRate=0.75"></video>
+            </div>
+        </div>
+    </section>
+
+    <section id="step-1">
+        <div class="case-grid">
+            <div class="case-text">
+                <span class="mono" data-ru="Шаг 01. Инфраструктура" data-en="Step 01. Infrastructure" data-kk="Қадам 01. Инфрақұрылым" data-uz="Qadam 01. Infratuzilma">Шаг 01. Инфраструктура</span>
+                <h2 data-ru="Узлы радиосвязи" data-en="Radio communication nodes" data-kk="Радиобайланыс тораптары" data-uz="Radioaloqa tugunlari">Узлы радиосвязи</h2>
+                <p data-ru="В условиях сложного рельефа мы разворачиваем независимые точки передачи данных. Они обеспечивают стабильное покрытие стандартов WLL, WiMax и WiFi для сбора телеметрии со всей техники." data-en="In complex terrain conditions, we deploy independent data transmission points. They provide stable coverage of WLL, WiMax, and WiFi standards for collecting telemetry from all equipment." data-kk="Күрделі рельеф жағдайында біз тәуелсіз деректерді беру нүктелерін орналастырамыз. Олар барлық техникадан телеметрияны жинау үшін WLL, WiMax және WiFi стандарттарының тұрақты қамтылуын қамтамасыз етеді." data-uz="Murakkab relef sharoitida biz mustaqil ma'lumotlarni uzatish nuqtalarini joylashtiramiz. Ular barcha uskunalardan telemetriyani to'plash uchun WLL, WiMax va WiFi standartlarining barqaror qamrovini ta'minlaydi.">В условиях сложного рельефа мы разворачиваем независимые точки передачи данных. Они обеспечивают стабильное покрытие стандартов WLL, WiMax и WiFi для сбора телеметрии со всей техники.</p>
+                
+                <div class="features-list">
+                    <div class="feature-item cyan">
+                        <div><span style="font-size: 16px; color: var(--text-main); font-weight: 600; display: inline;" data-ru="Магистральная сеть" data-en="Backbone network" data-kk="Магистральдық желі" data-uz="Magistral tarmoq">Магистральная сеть</span>
+                            <span data-ru="Построение радиорелейных мостов на базе направленных и секторных антенн." data-en="Building radio relay bridges based on directional and sector antennas." data-kk="Бағытталған және секторлық антенналар негізінде радиорелейлік көпірлер салу." data-uz="Yo'naltirilgan va sektorli antennalar asosida radioreleli ko'priklarni qurish.">Построение радиорелейных мостов на базе направленных и секторных антенн.</span>
+                        </div>
+                    </div>
+                    <div class="feature-item amber">
+                        <div><span style="font-size: 16px; color: var(--text-main); font-weight: 600; display: inline;" data-ru="Автономная работа" data-en="Autonomous operation" data-kk="Автономды жұмыс" data-uz="Avtonom ishlash">Автономная работа</span>
+                            <span data-ru="Использование солнечной генерации для круглосуточного питания телекоммуникационного оборудования." data-en="Using solar generation for 24/7 power supply of telecommunication equipment." data-kk="Телекоммуникациялық жабдықты тәулік бойы қуаттандыру үшін күн генерациясын пайдалану." data-uz="Telekommunikatsiya uskunalarini kunu tun elektr energiyasi bilan ta'minlash uchun quyosh energiyasidan foydalanish.">Использование солнечной генерации для круглосуточного питания телекоммуникационного оборудования.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="images-row">
+                <div class="image-wrapper">
+                    <div class="img-badge">1</div>
+                    <img src="IMG_20250708_170304.jpg" alt="Autonomous Relay Station">
+                </div>
+                <div class="image-wrapper">
+                    <div class="img-badge">2</div>
+                    <img src="IMG_20250907_085708.jpg" alt="Solar Panel and Cabinet">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="step-2">
+        <div class="case-grid reverse">
+            <div class="case-text">
+                <span class="mono" data-ru="Шаг 02. Питание" data-en="Step 02. Power Supply" data-kk="Қадам 02. Қуат көзі" data-uz="Qadam 02. Elektr ta'minoti">Шаг 02. Питание</span>
+                <h2 data-ru="Отказоустойчивые шкафы" data-en="Fault-tolerant cabinets" data-kk="Ақауларға төзімді шкафтар" data-uz="Nosozlikka chidamli shkaflar">Отказоустойчивые шкафы</h2>
+                <p data-ru="Промышленное оборудование связи требует стабильного напряжения. Мы собираем и монтируем распределительные щиты, способные работать при экстремальных перепадах температур." data-en="Industrial communication equipment requires stable voltage. We assemble and install switchboards capable of operating under extreme temperature drops." data-kk="Өнеркәсіптік байланыс жабдықтары тұрақты кернеуді қажет етеді. Біз экстремалды температураның төмендеуі кезінде жұмыс істей алатын тарату қалқандарын жинап, орнатамыз." data-uz="Sanoat aloqa uskunalari barqaror kuchlanishni talab qiladi. Biz ekstremal haroratning tushishi paytida ishlashga qodir tarqatish shitlarini yig'amiz va o'rnatamiz.">Промышленное оборудование связи требует стабильного напряжения. Мы собираем и монтируем распределительные щиты, способные работать при экстремальных перепадах температур.</p>
+                
+                <div class="features-list">
+                    <div class="feature-item cyan">
+                        <div><span style="font-size: 16px; color: var(--text-main); font-weight: 600; display: inline;" data-ru="MPPT контроллеры" data-en="MPPT controllers" data-kk="MPPT контроллерлері" data-uz="MPPT kontrollerlari">MPPT контроллеры</span>
+                            <span data-ru="Оптимизация заряда аккумуляторов от солнечных панелей с мониторингом состояния." data-en="Optimization of battery charge from solar panels with condition monitoring." data-kk="Күйін бақылайтын күн панельдерінен аккумуляторлардың зарядын оңтайландыру." data-uz="Holatni kuzatish bilan quyosh panellaridan akkumulyator zaryadini optimallashtirish.">Оптимизация заряда аккумуляторов от солнечных панелей с мониторингом состояния.</span>
+                        </div>
+                    </div>
+                    <div class="feature-item cyan">
+                        <div><span style="font-size: 16px; color: var(--text-main); font-weight: 600; display: inline;" data-ru="Резервирование" data-en="Redundancy" data-kk="Резервтеу" data-uz="Zaxiralash">Резервирование</span>
+                            <span data-ru="Установка промышленных свинцово-кислотных аккумуляторов для стабильной работы ночью и в непогоду." data-en="Installation of industrial lead-acid batteries for stable operation at night and in bad weather." data-kk="Түнде және қолайсыз ауа-райында тұрақты жұмыс істеу үшін өнеркәсіптік қорғасын-қышқылды аккумуляторларды орнату." data-uz="Tunda va yomon ob-havoda barqaror ishlash uchun sanoat qo'rg'oshin-kislotali akkumulyatorlarini o'rnatish.">Установка промышленных свинцово-кислотных аккумуляторов для стабильной работы ночью и в непогоду.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="image-wrapper">
+                <div class="img-badge">3</div>
+                <img src="IMG_20250907_085700.jpg" alt="Power Distribution Cabinet Inside">
+            </div>
+        </div>
+    </section>
+
+    <section id="step-3">
+        <div class="case-grid">
+            <div class="case-text">
+                <span class="mono" data-ru="Шаг 03. Монтаж" data-en="Step 03. Installation" data-kk="Қадам 03. Монтаждау" data-uz="Qadam 03. O'rnatish">Шаг 03. Монтаж</span>
+                <h2 data-ru="Внешний обвес техники" data-en="External machinery body kit" data-kk="Техниканың сыртқы жабдығы" data-uz="Texnikaning tashqi jihozlari">Внешний обвес техники</h2>
+                <p data-ru="Мы интегрируем элементы АСУ ГТК на базе спецтехники Volvo. Монтаж датчиков, антенн высокоточной навигации и V2X выполняется с учетом сильной вибрации и запыленности карьера." data-en="We integrate ACS MTC elements on the base of Volvo special equipment. Installation of sensors, high-precision navigation antennas and V2X is performed taking into account the strong vibration and dustiness of the quarry." data-kk="Біз Volvo арнайы техникасы базасында ТКК АБЖ элементтерін біріктіреміз. Датчиктерді, жоғары дәлдіктегі навигациялық антенналарды және V2X орнату карьердің қатты дірілі мен шаңын ескере отырып орындалады." data-uz="Biz Volvo maxsus texnikasi bazasida ATB elementlarini integratsiyalashmoqdamiz. Datchiklar, yuqori aniqlikdagi navigatsiya antennalari va V2X ni o'rnatish karyerning kuchli tebranishi va changlanishini hisobga olgan holda amalga oshiriladi.">Мы интегрируем элементы АСУ ГТК на базе спецтехники Volvo. Монтаж датчиков, антенн высокоточной навигации и V2X выполняется с учетом сильной вибрации и запыленности карьера.</p>
+                
+                <div class="features-list">
+                    <div class="feature-item amber">
+                        <div><span style="font-size: 16px; color: var(--text-main); font-weight: 600; display: inline;" data-ru="Навигация и связь" data-en="Navigation and communication" data-kk="Навигация және байланыс" data-uz="Navigatsiya va aloqa">Навигация и связь</span>
+                            <span data-ru="Установка внешних коммутационных блоков и антенн GPS/ГЛОНАСС на крышах кабин." data-en="Installation of external switching units and GPS/GLONASS antennas on cabin roofs." data-kk="Кабина төбелерінде сыртқы коммутациялық блоктарды және GPS/ГЛОНАСС антенналарын орнату." data-uz="Kabinaning tomlarida tashqi kommutatsiya bloklari va GPS/GLONASS antennalarini o'rnatish.">Установка внешних коммутационных блоков и антенн GPS/ГЛОНАСС на крышах кабин.</span>
+                        </div>
+                    </div>
+                    <div class="feature-item amber">
+                        <div><span style="font-size: 16px; color: var(--text-main); font-weight: 600; display: inline;" data-ru="Герметичность" data-en="Tightness" data-kk="Герметикалық" data-uz="Zichlik">Герметичность</span>
+                            <span data-ru="Прокладка кабельных трасс и фиксация оборудования без нарушения заводской герметичности техники." data-en="Laying cable routes and securing equipment without violating the factory sealing of the machinery." data-kk="Техниканың зауыттық герметикалығын бұзбай кабельдік трассаларды төсеу және жабдықты бекіту." data-uz="Texnikaning zavod zichligini buzmasdan kabel trassalarini yotqizish va uskunalarni mahkamlash.">Прокладка кабельных трасс и фиксация оборудования без нарушения заводской герметичности техники.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="images-row">
+                <div class="image-wrapper">
+                    <div class="img-badge">4</div>
+                    <img src="IMG_20250907_090401.jpg" alt="Heavy Machinery Antennas">
+                </div>
+                <div class="image-wrapper">
+                    <div class="img-badge">5</div>
+                    <img src="IMG_20250715_155110.jpg" alt="Volvo Cabin External Systems">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="step-4">
+        <div class="case-grid reverse">
+            <div class="case-text">
+                <span class="mono" data-ru="Шаг 04. Телеметрия" data-en="Step 04. Telemetry" data-kk="Қадам 04. Телеметрия" data-uz="Qadam 04. Telemetriya">Шаг 04. Телеметрия</span>
+                <h2 data-ru="Бортовая коммутация" data-en="Onboard switching" data-kk="Борттық коммутация" data-uz="Bort kommutatsiyasi">Бортовая коммутация</h2>
+                <p data-ru="Для корректной работы систем позиционирования необходимо адаптировать электропитание машины под нужды слаботочных систем." data-en="For the correct operation of positioning systems, it is necessary to adapt the machine's power supply to the needs of low-current systems." data-kk="Позициялау жүйелерінің дұрыс жұмыс істеуі үшін машинаның қуатын төмен ток жүйелерінің қажеттіліктеріне бейімдеу қажет." data-uz="Joylashuv tizimlarining to'g'ri ishlashi uchun mashinaning quvvatini past oqim tizimlarining ehtiyojlariga moslashtirish kerak.">Для корректной работы систем позиционирования необходимо адаптировать электропитание машины под нужды слаботочных систем.</p>
+                
+                <div class="features-list">
+                    <div class="feature-item cyan">
+                        <div><span style="font-size: 16px; color: var(--text-main); font-weight: 600; display: inline;" data-ru="Преобразователи питания" data-en="Power converters" data-kk="Қуат түрлендіргіштері" data-uz="Quvvat konvertorlari">Преобразователи питания</span>
+                            <span data-ru="Использование защищенных конвертеров 24/12В для стабилизации напряжения бортовой сети." data-en="Using protected 24/12V converters to stabilize the onboard network voltage." data-kk="Борттық желінің кернеуін тұрақтандыру үшін қорғалған 24/12В конвертерлерін пайдалану." data-uz="Bort tarmog'ining kuchlanishini barqarorlashtirish uchun himoyalangan 24/12V konvertorlaridan foydalanish.">Использование защищенных конвертеров 24/12В для стабилизации напряжения бортовой сети.</span>
+                        </div>
+                    </div>
+                    <div class="feature-item cyan">
+                        <div><span style="font-size: 16px; color: var(--text-main); font-weight: 600; display: inline;" data-ru="Сбор данных" data-en="Data collection" data-kk="Деректерді жинау" data-uz="Ma'lumotlarni yig'ish">Сбор данных</span>
+                            <span data-ru="Коммутация блоков передачи данных ALFA для интеграции с центральной системой диспетчеризации." data-en="Switching ALFA data transmission units for integration with the central dispatch system." data-kk="Орталық диспетчерлік жүйемен біріктіру үшін ALFA деректерді беру блоктарын коммутациялау." data-uz="Markaziy dispetcherlik tizimi bilan integratsiyalash uchun ALFA ma'lumotlarni uzatish bloklarini kommutatsiya qilish.">Коммутация блоков передачи данных ALFA для интеграции с центральной системой диспетчеризации.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="image-wrapper">
+                <div class="img-badge">6</div>
+                <img src="IMG_20250907_094329.jpg" alt="Telemetry Open Cabinet on Machinery">
+            </div>
+        </div>
+    </section>
+
+    <section id="step-5">
+        <div class="case-grid">
+            <div class="case-text">
+                <span class="mono" data-ru="Шаг 05. Операторская среда" data-en="Step 05. Operator Environment" data-kk="Қадам 05. Операторлық орта" data-uz="Qadam 05. Operator muhiti">Шаг 05. Операторская среда</span>
+                <h2 data-ru="Оцифровка рабочего места" data-en="Workplace digitization" data-kk="Жұмыс орнын цифрландыру" data-uz="Ish joyini raqamlashtirish">Оцифровка рабочего места</h2>
+                <p data-ru="Организация единого бортового интерфейса прямо перед глазами машиниста. Система позволяет синхронизировать действия оператора с диспетчером для оптимизации маршрутов." data-en="Organization of a single onboard interface right before the driver's eyes. The system allows synchronizing the operator's actions with the dispatcher to optimize routes." data-kk="Машинистің көз алдында бірыңғай борттық интерфейсті ұйымдастыру. Жүйе маршруттарды оңтайландыру үшін оператордың әрекеттерін диспетчермен синхрондауға мүмкіндік береді." data-uz="Mashinistning ko'z o'ngida yagona bort interfeysini tashkil etish. Tizim yo'nalishlarni optimallashtirish uchun operatorning harakatlarini dispetcher bilan sinxronlashtirishga imkon beradi.">Организация единого бортового интерфейса прямо перед глазами машиниста. Система позволяет синхронизировать действия оператора с диспетчером для оптимизации маршрутов.</p>
+                
+                <div class="features-list">
+                    <div class="feature-item amber">
+                        <div><span style="font-size: 16px; color: var(--text-main); font-weight: 600; display: inline;" data-ru="Бортовые компьютеры" data-en="Onboard computers" data-kk="Борттық компьютерлер" data-uz="Bort kompyuterlari">Бортовые компьютеры</span>
+                            <span data-ru="Монтаж промышленных планшетов Hexagon для выдачи команд и контроля загрузки." data-en="Installation of Hexagon industrial tablets for issuing commands and monitoring loading." data-kk="Буйрықтар беру және жүктеуді бақылау үшін Hexagon өнеркәсіптік планшеттерін орнату." data-uz="Buyruqlar berish va yuklashni nazorat qilish uchun Hexagon sanoat planshetlarini o'rnatish.">Монтаж промышленных планшетов Hexagon для выдачи команд и контроля загрузки.</span>
+                        </div>
+                    </div>
+                    <div class="feature-item amber">
+                        <div><span style="font-size: 16px; color: var(--text-main); font-weight: 600; display: inline;" data-ru="Промышленное видеонаблюдение" data-en="Industrial video surveillance" data-kk="Өнеркәсіптік бейнебақылау" data-uz="Sanoat video nazorati">Промышленное видеонаблюдение</span>
+                            <span data-ru="Установка внутренних купольных камер для контроля безопасности и действий водителя." data-en="Installation of internal dome cameras to monitor safety and driver actions." data-kk="Қауіпсіздік пен жүргізуші әрекеттерін бақылау үшін ішкі күмбезді камераларды орнату." data-uz="Xavfsizlik va haydovchi harakatlarini nazorat qilish uchun ichki gumbazli kameralarni o'rnatish.">Установка внутренних купольных камер для контроля безопасности и действий водителя.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="images-group">
+                <div class="image-wrapper">
+                    <div class="img-badge">7</div>
+                    <img src="IMG_20250907_094407.jpg" alt="Cabin Interior Hexagon System">
+                </div>
+                <div class="image-wrapper">
+                    <div class="img-badge">8</div>
+                    <img src="IMG_20250907_094354.jpg" alt="Cabin Dashboard and Camera">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        let currentLang = 'ru';
+
+        function toggleDropdown(event) {
+            if(event) event.stopPropagation();
+            const content = document.getElementById('langContent');
+            if(content.style.opacity === '1') {
+                content.style.opacity = '0';
+                content.style.visibility = 'hidden';
+                content.style.transform = 'translateY(-10px)';
+            } else {
+                content.style.opacity = '1';
+                content.style.visibility = 'visible';
+                content.style.transform = 'translateY(0)';
+            }
+        }
+
+        function setLang(lang) {
+            currentLang = lang;
+            localStorage.setItem('qidrix_lang', lang);
+            
+            document.getElementById('currentLangDisplay').innerText = lang.toUpperCase();
+            const content = document.getElementById('langContent');
+            content.style.opacity = '0';
+            content.style.visibility = 'hidden';
+            content.style.transform = 'translateY(-10px)';
+            
+            document.querySelectorAll('[data-' + lang + ']').forEach(el => {
+                if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+                    el.placeholder = el.getAttribute('data-' + lang);
+                } else {
+                    el.innerHTML = el.getAttribute('data-' + lang);
+                }
+            });
+            
+            document.querySelectorAll('.lang-dropdown-btn').forEach(btn => {
+                const isMatch = btn.getAttribute('data-lang') === lang;
+                if(isMatch) {
+                    btn.style.background = 'var(--border)';
+                    btn.style.color = 'var(--accent-cyan)';
+                } else {
+                    btn.style.background = 'none';
+                    btn.style.color = 'var(--text-muted)';
+                }
+            });
+        }
+
+        function toggleTheme() {
+            const body = document.documentElement;
+            const currentTheme = body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            body.setAttribute('data-theme', newTheme);
+            localStorage.setItem('qidrix_theme', newTheme);
+            updateThemeIcon(newTheme);
+        }
+
+        function updateThemeIcon(theme) {
+            const themeIcon = document.getElementById('themeIcon');
+            if (theme === 'light') {
+                themeIcon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>';
+            } else {
+                themeIcon.innerHTML = '<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>';
+            }
+        }
+
+        function toggleMenu() {
+            document.getElementById('sidePanel').classList.toggle('open');
+            document.getElementById('panelOverlay').classList.toggle('open');
+            document.body.style.overflow = document.getElementById('sidePanel').classList.contains('open') ? 'hidden' : '';
+        }
+
+        window.onclick = function(event) {
+            if (!event.target.closest('.lang-dropdown')) {
+                const content = document.getElementById('langContent');
+                if(content) {
+                    content.style.opacity = '0';
+                    content.style.visibility = 'hidden';
+                    content.style.transform = 'translateY(-10px)';
+                }
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('qidrix_theme');
+            const currentTheme = savedTheme ? savedTheme : 'dark';
+            document.documentElement.setAttribute('data-theme', currentTheme);
+            updateThemeIcon(currentTheme);
+
+            const savedLang = localStorage.getItem('qidrix_lang');
+            if (savedLang) {
+                setLang(savedLang);
+            } else {
+                setLang('ru');
+            }
+        });
+    </script>
+</body>
+</html>
