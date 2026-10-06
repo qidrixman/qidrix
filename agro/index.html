@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Qidrix | Project Case Study</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    
+    <script>
+        if ('scrollRestoration' in history) {
+            history.scrollRestoration = 'manual';
+        }
+        if (window.location.hash) {
+            window.history.replaceState(null, null, window.location.pathname);
+        }
+        window.scrollTo(0, 0);
+    </script>
+
+    <style>
+        /* === ТЕМНЫЕ И СВЕТЛЫЕ ПЕРЕМЕННЫЕ === */
+        :root, [data-theme="dark"] {
+            --bg-main: #121417;
+            --bg-panel: #1E2126;
+            --bg-header: rgba(18, 20, 23, 0.85);
+            --bg-overlay: rgba(18, 20, 23, 0.8);
+            --text-main: #F3F4F6;
+            --text-muted: #9CA3AF;
+            --accent-cyan: #00E5FF;
+            --accent-amber: #FFB800;
+            --border: rgba(255, 255, 255, 0.05);
+            --grid-line: rgba(0, 229, 255, 0.05);
+            --shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+
+        [data-theme="light"] {
+            --bg-main: #F8FAFC;
+            --bg-panel: #FFFFFF;
+            --bg-header: rgba(248, 250, 252, 0.9);
+            --bg-overlay: rgba(15, 23, 42, 0.6);
+            --text-main: #0F172A;
+            --text-muted: #475569;
+            --accent-cyan: #0284C7;
+            --accent-amber: #D97706;
+            --border: #E2E8F0;
+            --grid-line: rgba(2, 132, 199, 0.05);
+            --shadow: 0 4px 15px rgba(15, 23, 42, 0.05);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; scroll-padding-top: 80px; } 
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            transition: background-color 0.4s ease, color 0.4s ease;
+            overflow-x: hidden;
+        }
+
+        .grid-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background-image: 
+                linear-gradient(var(--grid-line) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: -1;
+            transition: background-image 0.4s ease;
+        }
+
+        /* === НАВИГАЦИЯ (HEADER) === */
+        header { 
+            background-color: var(--bg-header); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            position: fixed; width: 100%; top: 0; z-index: 1000; border-bottom: 1px solid var(--border); 
+            transition: 0.4s ease; 
+        }
+        
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; width: 100%; }
+        nav { display: flex; justify-content: space-between; align-items: center; height: 80px; }
+        
+        .logo { display: flex; align-items: center; gap: 15px; text-decoration: none; cursor: pointer; }
+        .logo-svg { width: 36px; height: 36px; }
+        .logo-text { font-size: 26px; font-weight: 800; color: var(--text-main); letter-spacing: -1px; transition: 0.4s; }
+        .logo-text span { color: var(--accent-cyan); }
+        
+        /* В кейсах ссылки меню скрыты, оставляем только лого и переключатели */
+        .nav-links { display: none; } 
+        
+        .nav-right { display: flex; align-items: center; gap: 12px; }
+
+        .icon-btn { 
+            background: var(--bg-panel); border: 1px solid var(--border); color: var(--text-main); 
+            cursor: pointer; display: flex; align-items: center; justify-content: center; 
+            border-radius: 50%; transition: 0.3s; box-shadow: var(--shadow); 
+        }
+        .theme-toggle-btn { width: 42px; height: 42px; }
+        .theme-toggle-btn:hover { border-color: var(--accent-cyan); color: var(--accent-cyan); transform: rotate(15deg); }
+        .theme-toggle-btn svg { width: 18px; height: 18px; }
+
+        .lang-dropdown { position: relative; display: inline-block; }
+        .lang-menu-btn { 
+            background: var(--bg-panel); border: 1px solid var(--border); color: var(--text-main); 
+            cursor: pointer; display: flex; align-items: center; gap: 8px; padding: 10px 18px; 
+            border-radius: 20px; font-size: 14px; font-weight: 600; transition: 0.3s; box-shadow: var(--shadow); 
+        }
+        .lang-menu-btn:hover, .lang-dropdown.active .lang-menu-btn { border-color: var(--accent-cyan); color: var(--accent-cyan); }
+        .lang-menu-btn svg { width: 18px; height: 18px; }
+        
+        .lang-dropdown-content { 
+            position: absolute; top: 100%; right: 0; margin-top: 10px; background: var(--bg-panel); 
+            border: 1px solid var(--border); border-radius: 12px; padding: 8px; display: flex; 
+            flex-direction: column; gap: 4px; box-shadow: var(--shadow); min-width: 150px; 
+            opacity: 0; visibility: hidden; transform: translateY(-10px); transition: 0.3s; z-index: 1001; 
+        }
+        .lang-dropdown-content.show { opacity: 1; visibility: visible; transform: translateY(0); }
+        .lang-dropdown-btn { 
+            background: none; border: none; color: var(--text-muted); padding: 10px 16px; 
+            text-align: left; cursor: pointer; border-radius: 8px; font-weight: 600; font-size: 13px; 
+            transition: 0.2s; display: flex; align-items: center; gap: 8px; white-space: nowrap; 
+        }
+        .lang-dropdown-btn:hover, .lang-dropdown-btn.active { background: var(--border); color: var(--accent-cyan); }
+
+        .burger-btn { background: none; border: none; color: var(--text-main); cursor: pointer; display: none; align-items: center; padding: 4px; transition: 0.3s; }
+        
+        /* Мобильное меню */
+        .panel-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background: var(--bg-overlay); backdrop-filter: blur(4px); z-index: 1999; opacity: 0; visibility: hidden; transition: 0.4s; pointer-events: none;}
+        .panel-overlay.open { opacity: 1; visibility: visible; pointer-events: auto;}
+        .side-panel { position: fixed; top: 0; right: -320px; width: 320px; max-width: 100%; height: 100vh; background: var(--bg-panel); z-index: 2000; box-shadow: -10px 0 40px rgba(0,0,0,0.5); transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.4s; padding: 60px 30px; border-left: 1px solid var(--border); overflow-y: auto; }
+        .side-panel.open { right: 0; }
+        .close-btn { position: absolute; top: 24px; right: 24px; background: none; border: none; color: var(--text-muted); cursor: pointer; transition: 0.3s; }
+        .close-btn:hover { color: var(--text-main); transform: rotate(90deg); }
+        .mobile-nav-links { display: flex; flex-direction: column; gap: 24px; list-style: none; }
+        .mobile-nav-links a { color: var(--text-main); text-decoration: none; font-size: 18px; font-weight: 600; transition: 0.3s; display: block; }
+        .mobile-nav-links a:hover { color: var(--accent-cyan); }
+
+        /* === ОСНОВНОЙ КОНТЕНТ === */
+        section {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 100px 10vw 80px; /* Отступ под шапку */
+            border-bottom: 1px solid var(--border);
+            position: relative;
+        }
+
+        h1 { font-size: 56px; font-weight: 800; letter-spacing: -2px; margin-top: 0; margin-bottom: 20px; line-height: 1.1; transition: color 0.4s; }
+        h1 span { color: var(--accent-cyan); }
+        h2 { font-size: 42px; font-weight: 800; margin-top: 0; margin-bottom: 20px; color: var(--text-main); letter-spacing: -1px; transition: color 0.4s;}
+        p { font-size: 18px; color: var(--text-muted); max-width: 600px; line-height: 1.6; transition: color 0.4s;}
+        
+        .mono {
+            font-family: 'Fira Code', monospace;
+            color: var(--accent-cyan);
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 0;
+            margin-bottom: 20px;
+            display: block;
+            line-height: 1;
+        }
+
+        /* === СЕТКА === */
+        .case-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: stretch;
+            width: 100%;
+        }
+
+        .case-grid.hero-grid { align-items: center; }
+        .case-grid.reverse { direction: rtl; }
+        .case-grid.reverse > * { direction: ltr; }
+
+        .text-column {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .text-content {
+            display: flex;
+            flex-direction: column;
+            margin-top: -5px;
+        }
+
+        /* === АНИМАЦИИ-ЗАПОЛНИТЕЛИ === */
+        .tech-animation-container {
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 120px;
+            opacity: 0.7;
+        }
+
+        /* Волны */
+        .anim-waves { width: 80px; height: 80px; position: relative; }
+        .anim-waves::before, .anim-waves::after, .anim-waves span {
+            content: ''; position: absolute; border: 2px solid var(--accent-cyan);
+            border-radius: 50%; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            animation: pulse-wave 4.5s infinite ease-out;
+        }
+        .anim-waves::after { animation-delay: 1.5s; }
+        .anim-waves span { animation-delay: 3s; }
+        @keyframes pulse-wave { 0% { width: 0; height: 0; opacity: 1; } 100% { width: 100%; height: 100%; opacity: 0; } }
+
+        /* Радар */
+        .anim-radar {
+            width: 80px; height: 80px; border-radius: 50%;
+            border: 2px solid rgba(0, 229, 255, 0.2); position: relative; overflow: hidden;
+        }
+        .anim-radar::before {
+            content: ''; position: absolute; top: 50%; left: 50%; width: 50%; height: 50%;
+            background: conic-gradient(from 0deg, transparent 70%, var(--accent-cyan) 100%);
+            transform-origin: 0 0; animation: spin 4s linear infinite;
+        }
+
+        /* Синхронизация */
+        .anim-sync {
+            width: 70px; height: 70px; border: 3px dashed var(--accent-amber);
+            border-radius: 50%; animation: spin 12s linear infinite; position: relative;
+        }
+        .anim-sync::after {
+            content: ''; position: absolute; top: 50%; left: 50%; width: 30px; height: 30px; border-radius: 50%;
+            background: rgba(255, 184, 0, 0.2); transform: translate(-50%, -50%);
+            animation: pulse-glow 3s ease-in-out infinite alternate;
+        }
+
+        /* Сканнер */
+        .anim-scan {
+            width: 100px; height: 70px; border: 2px solid rgba(0, 229, 255, 0.2);
+            border-radius: 8px; position: relative; overflow: hidden;
+        }
+        .anim-scan::after {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px;
+            background: var(--accent-cyan); box-shadow: 0 0 12px 2px var(--accent-cyan);
+            animation: scan-line 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        @keyframes pulse-glow { 100% { transform: translate(-50%, -50%) scale(1.5); opacity: 0.5; } }
+        @keyframes scan-line { 0% { top: 0; } 100% { top: 100%; } }
+
+        /* === КАРТОЧКИ === */
+        .features-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 0;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            background: var(--bg-panel);
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--accent-amber);
+            transition: background-color 0.4s, border-color 0.4s;
+        }
+        
+        .feature-item.cyan { border-left: 3px solid var(--accent-cyan); }
+
+        .feature-item div { font-size: 16px; color: var(--text-main); font-weight: 600; transition: color 0.4s;}
+        .feature-item span { display: block; font-size: 14px; color: var(--text-muted); margin-top: 6px; font-weight: 400; line-height: 1.5; transition: color 0.4s;}
+
+        /* === ФОТОГРАФИИ === */
+        .images-column {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .image-wrapper {
+            position: relative; border-radius: 16px; overflow: hidden;
+            border: 1px solid var(--border); box-shadow: var(--shadow);
+            background: var(--bg-panel); width: 100%; display: flex; transition: border-color 0.4s;
+        }
+
+        .image-wrapper img {
+            width: 100%; height: auto; display: block; transition: transform 0.7s ease;
+        }
+
+        .hero-img-wrapper {
+             position: relative; border-radius: 16px; overflow: hidden;
+             border: 1px solid var(--border); box-shadow: var(--shadow);
+             background: var(--bg-panel); width: 100%; height: 100%; min-height: 400px;
+             transition: border-color 0.4s;
+        }
+
+        @keyframes breathe-pan { 0% { transform: scale(1); } 100% { transform: scale(1.06); } }
+
+        .image-wrapper img { animation: breathe-pan 20s infinite alternate ease-in-out; }
+        
+        .hero-img-wrapper img, .hero-img-wrapper video {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transition: transform 0.7s ease;
+        }
+
+        .hero-img-wrapper img { animation: breathe-pan 20s infinite alternate ease-in-out; }
+        .hero-img-wrapper video { animation: none; }
+
+        .image-wrapper:hover img, .hero-img-wrapper:hover img, .hero-img-wrapper:hover video { 
+            animation-play-state: paused; filter: brightness(1.1); transition: filter 0.5s ease; 
+        }
+
+        /* АДАПТИВНОСТЬ */
+        @media (max-width: 968px) {
+            .case-grid, .case-grid.reverse { grid-template-columns: 1fr; direction: ltr; align-items: start; gap: 40px; }
+            .text-column { gap: 30px; }
+            .hero-img-wrapper { aspect-ratio: 16/9; height: auto; min-height: auto; }
+            .tech-animation-container { display: none; }
+            h1 { font-size: 42px; }
+            h2 { font-size: 32px; }
+            section { padding: 100px 20px 40px; min-height: auto; }
+            .text-content { margin-top: 0; }
+            .burger-btn { display: flex; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="grid-bg"></div>
+
+    <!-- HEADER (ИДЕНТИЧНЫЙ ГЛАВНОЙ СТРАНИЦЕ, НО БЕЗ ССЫЛОК МЕНЮ) -->
+    <header>
+        <div class="container">
+            <nav>
+                <a href="../index.html" class="logo">
+                    <svg class="logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M 10 10 H 80 V 60 H 60 V 30 H 30 V 60 H 60 V 80 H 10 Z" fill="currentColor" />
+                        <rect x="60" y="60" width="30" height="30" fill="var(--accent-cyan)" />
+                    </svg>
+                    <div class="logo-text">Qidri<span>x</span></div>
+                </a>
+
+                <div class="nav-right">
+                    <button class="theme-toggle-btn icon-btn" onclick="toggleTheme()" aria-label="Toggle Theme" id="themeBtn">
+                        <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                        </svg>
+                    </button>
+
+                    <div class="lang-dropdown" id="langDropdown">
+                        <button class="lang-menu-btn" onclick="toggleDropdown(event)" aria-label="Select Language">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="2" y1="12" x2="22" y2="12"></line>
+                                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1 4-10z"></path>
+                            </svg>
+                            <span id="currentLangDisplay">RU</span>
+                        </button>
+                        <div class="lang-dropdown-content" id="langContent">
+                            <button class="lang-dropdown-btn" data-lang="en" onclick="setLang('en')"><span class="lang-flag">🇬🇧</span> English</button>
+                            <button class="lang-dropdown-btn" data-lang="uz" onclick="setLang('uz')"><span class="lang-flag">🇺🇿</span> O'zbek</button>
+                            <button class="lang-dropdown-btn" data-lang="kk" onclick="setLang('kk')"><span class="lang-flag">🇰🇿</span> Қазақша</button>
+                            <button class="lang-dropdown-btn active" data-lang="ru" onclick="setLang('ru')"><span class="lang-flag">🇷🇺</span> Русский</button>
+                        </div>
+                    </div>
+                    
+                    <button class="burger-btn" onclick="toggleMenu()" aria-label="Menu">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="3" y1="12" x2="21" y2="12"></line>
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <line x1="3" y1="18" x2="21" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <div class="panel-overlay" id="panelOverlay" onclick="toggleMenu()"></div>
+    <div class="side-panel" id="sidePanel">
+        <button class="close-btn" onclick="toggleMenu()">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+        </button>
+        <div class="panel-content">
+            <ul class="mobile-nav-links">
+                <li><a href="../index.html" onclick="toggleMenu()" data-ru="Вернуться на главную" data-en="Back to Home" data-kk="Басты бетке оралу" data-uz="Asosiy sahifaga qaytish">Вернуться на главную</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- КЕЙС: Главный экран -->
+    <section>
+        <div class="case-grid hero-grid">
+            <div class="text-column" style="max-width: 800px;">
+                <div class="text-content" style="margin-top: 0;">
+                    <span class="mono" data-ru="PROJECT CASE STUDY" data-en="PROJECT CASE STUDY" data-kk="ЖОБА КЕЙСІ" data-uz="LOYIHA KEYS">PROJECT CASE STUDY</span>
+                    <h1 data-ru="Цифровизация в сельском хозяйстве" data-en="Digitization in agriculture" data-kk="Ауыл шаруашылығындағы цифрландыру" data-uz="Qishloq xo'jaligida raqamlashtirish">Цифровизация в сельском хозяйстве</h1>
+                    <p style="font-size: 24px; color: var(--text-main); margin-bottom: 20px;" data-ru="Интеграция систем связи, мониторинга и безопасности для агропромышленного комплекса." data-en="Integration of communication, monitoring and security systems for the agro-industrial complex." data-kk="Агроөнеркәсіптік кешенге арналған байланыс, мониторинг және қауіпсіздік жүйелерін біріктіру." data-uz="Agrosanoat majmuasi uchun aloqa, monitoring va xavfsizlik tizimlarini integratsiyalash.">Интеграция систем связи, мониторинга и безопасности для агропромышленного комплекса.</p>
+                    <p style="margin-bottom: 0;" data-ru="Комплексный подход к управлению полями и техникой. От построения спутниковых каналов связи до внедрения видеоаналитики урожайности и автоматизированного учета ГСМ." data-en="A comprehensive approach to field and machinery management. From building satellite communication channels to implementing crop video analytics and automated fuel accounting." data-kk="Өрістер мен техниканы басқарудың кешенді тәсілі. Жерсеріктік байланыс арналарын құрудан бастап өнімділіктің бейне аналитикасын және жанар-жағармай есебін автоматтандыруға дейін." data-uz="Dala va texnikani boshqarishga kompleks yondashuv. Sun'iy yo'ldosh aloqa kanallarini qurishdan tortib, hosildorlik video tahlili va avtomatlashtirilgan yoqilg'i hisobini joriy etishgacha.">Комплексный подход к управлению полями и техникой. От построения спутниковых каналов связи до внедрения видеоаналитики урожайности и автоматизированного учета ГСМ.</p>
+                </div>
+            </div>
+            <div class="images-column">
+                <div class="hero-img-wrapper">
+                    <!-- Замени на img src="1.jpg" если это фото -->
+                    <video src="video.mov" autoplay loop muted playsinline oncanplay="this.playbackRate=0.75"></video>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Шаг 01 -->
+    <section id="step-1">
+        <div class="case-grid reverse">
+            <div class="text-column">
+                <div class="text-content">
+                    <span class="mono" data-ru="Шаг 01. Инфраструктура" data-en="Step 01. Infrastructure" data-kk="Қадам 01. Инфрақұрылым" data-uz="Qadam 01. Infratuzilma">Шаг 01. Инфраструктура</span>
+                    <h2 data-ru="Организация каналов связи" data-en="Organization of communication channels" data-kk="Байланыс арналарын ұйымдастыру" data-uz="Aloqa kanallarini tashkil etish">Организация каналов связи</h2>
+                    <p style="margin-bottom: 0;" data-ru="Мы обеспечиваем 100% покрытие полей радиосигналом. Это фундамент для обмена данными между комбайнами, дронами и диспетчерским центром." data-en="We provide 100% field coverage with radio signals. This is the foundation for data exchange between harvesters, drones, and the dispatch center." data-kk="Біз өрістерді радиосигналмен 100% жабуды қамтамасыз етеміз. Бұл комбайндар, дрондар және диспетчерлік орталық арасындағы деректер алмасудың негізі." data-uz="Biz dalalarni radio signal bilan 100% qoplashni ta'minlaymiz. Bu kombaynlar, dronlar va dispetcherlik markazi o'rtasida ma'lumotlar almashinuvi uchun asosdir.">Мы обеспечиваем 100% покрытие полей радиосигналом. Это фундамент для обмена данными между комбайнами, дронами и диспетчерским центром.</p>
+                </div>
+                
+                <div class="tech-animation-container">
+                    <div class="anim-waves"><span></span></div>
+                </div>
+
+                <div class="features-list">
+                    <div class="feature-item cyan">
+                        <div><span style="font-size: 16px; color: var(--text-main); font-weight: 600; display: inline;" data-ru="Глобальное покрытие" data-en="Global coverage" data-kk="Ғаламдық қамту" data-uz="Global qamrov">Глобальное покрытие</span>
+                            <span data-ru="Доступ к сети через наземные и спутниковые каналы, включая интеграцию Starlink для отдаленных участков." data-en="Network access via terrestrial and satellite channels, including Starlink integration for remote areas." data-kk="Жерүсті және спутниктік арналар арқылы желіге қол жеткізу, шалғай аумақтар үшін Starlink интеграциясын қоса." data-uz="Uzoq hududlar uchun Starlink integratsiyasini hisobga olgan holda, er usti va sun'iy yo'ldosh kanallari orqali tarmoqqa kirish.">Доступ к сети через наземные и спутниковые каналы, включая интеграцию Starlink для отдаленных участков.</span>
+                        </div>
+                    </div>
+                    <div class="feature-item amber">
+                        <div><span style="font-size: 16px; color: var(--text-main); font-weight: 600; display: inline;" data-ru="Локальные сети" data-en="Local networks" data-kk="Жергілікті желілер" data-uz="Mahalliy tarmoqlar">Локальные сети</span>
+                            <span data-ru="Построение Mesh-сетей и WiFi зон для бесперебойной связи специальной техники и передачи телеметрии." data-en="Building Mesh networks and WiFi zones for uninterrupted communication of special equipment and telemetry transmission." data-kk="Арнайы техниканың үздіксіз байланысы және телеметрияны тасымалдау үшін Mesh-желілер мен WiFi аймақтарын құру." data-uz="Maxsus texnikaning uzluksiz aloqasi va telemetriya uzatilishi uchun Mesh-tarmoqlar va WiFi zonalarini qurish.">Построение Mesh-сетей и WiFi зон для бесперебойной связи специальной техники и передачи телеметрии.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="images-column">
+                <div class="image-wrapper">
+                    <img src="2.png" alt="Satellite Communication">
+                </div>
+                <div class="image-wrapper">
+                    <img src="3.jpg" alt="Antenna Network">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Шаг 02 -->
+    <section id="step-2">
+        <div class="case-grid">
+            <div class="text-column">
+                <div class="text-content">
+                    <span class="mono" data-ru="Шаг 02. Телеметрия" data-en="Step 02. Telemetry" data-kk="Қадам 02. Телеметрия" data-uz="Qadam 02. Telemetriya">Шаг 02. Телеметрия</span>
+                    <h2 data-ru="Мониторинг техники" data-en="Machinery Monitoring" data-kk="Техника мониторингі" data-uz="Texnika monitoringi">Мониторинг техники</h2>
+                    <p style="margin-bottom: 0;" data-ru="Навигационные блоки, интегрированные в штатные электронные системы тракторов, непрерывно передают данные о состоянии машины по GPS и ГЛОНАСС." data-en="Navigation blocks integrated into the standard electronic systems of tractors continuously transmit machine status data via GPS and GLONASS." data-kk="Тракторлардың штаттық электрондық жүйелеріне біріктірілген навигациялық блоктар GPS және ГЛОНАСС арқылы машинаның күйі туралы деректерді үздіксіз жібереді." data-uz="Traktorlarning standart elektron tizimlariga o'rnatilgan navigatsiya bloklari GPS va GLONASS orqali mashinaning holati haqidagi ma'lumotlarni doimiy ravishda uzatadi.">Навигационные блоки, интегрированные в штатные электронные системы тракторов, непрерывно передают данные о состоянии машины по GPS и ГЛОНАСС.</p>
+                </div>
+
+                <div class="tech-animation-container">
+                    <div class="anim-radar"></div>
+                </div>
+                
+                <div class="features-list">
+                    <div class="feature-item cyan">
+                        <div><span style="font-size: 16px; color: var(--text-main); font-weight: 600; display: inline;" data-ru="Контроль параметров" data-en="Parameter control" data-kk="Параметрлерді бақылау" data-uz="Parametrlarni nazorat qilish">Контроль параметров</span>
+                            <span data-ru="Анализ уровня топлива, температуры узлов, работы насосов и заряда аккумуляторов в реальном времени." data-en="Real-time analysis of fuel level, node temperature, pump operation, and battery charge." data-kk="Нақты уақытта жанармай деңгейін, түйіндердің температурасын, сорғылардың жұмысын және аккумулятор зарядын талдау." data-uz="Haqiqiy vaqt rejimida yoqilg'i darajasini, tugunlar haroratini, nasoslarning ishlashini va akkumulyator zaryadini tahlil qilish.">Анализ уровня топлива, температуры узлов, работы насосов и заряда аккумуляторов в реальном времени.</span>
+                        </div>
+                    </div>
+                    <div class="feature-item cyan">
+                        <div><span style="font-size: 16px; color: var(--text-main); font-weight: 600; display: inline;" data-ru="Управление работой" data-en="Work management" data-kk="Жұмысты басқару" data-uz="Ishni boshqarish">Управление работой</span>
+                            <span data-ru="Дистанционное включение зажигания и строгий контроль режима работы и отдыха водителей." data-en="Remote ignition activation and strict control of drivers' work and rest schedules." data-kk="От алдыруды қашықтан қосу және жүргізушілердің жұмыс және демалыс режимін қатаң бақылау." data-uz="Olovni masofadan yoqish va haydovchilarning ish va dam olish rejimini qat'iy nazorat qilish.">Дистанционное включение зажигания и строгий контроль режима работы и отдыха водителей.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="images-column">
+                 <div class="image-wrapper">
+                    <img src="4.jpg" alt="Tractor Telemetry Diagram">
+                </div>
+                <div class="image-wrapper">
+                    <img src="5.jpg" alt="Field Data Analysis">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Шаг 03 -->
+    <section id="step-3">
+        <div class="case-grid reverse">
+            <div class="text-column">
+                <div class="text-content">
+                    <span class="mono" data-ru="Шаг 03. Учет ресурсов" data-en="Step 03. Resource Accounting" data-kk="Қадам 03. Ресурстарды есепке алу" data-uz="Qadam 03. Resurslarni hisobga olish">Шаг 03. Учет ресурсов</span>
+                    <h2 data-ru="Автоматизация ГСМ" data-en="Fuel and Lubricants Automation" data-kk="ЖЖМ автоматтандыру" data-uz="YMM avtomatlashtirish">Автоматизация ГСМ</h2>
+                    <p style="margin-bottom: 0;" data-ru="Комплекс для полного контроля нефтепродуктов исключает человеческий фактор: от приемки топлива на склад до попадания в бак спецтехники." data-en="The complex for complete control of petroleum products eliminates the human factor: from receiving fuel at the warehouse to entering the tank of special equipment." data-kk="Мұнай өнімдерін толық бақылау кешені адами факторды болдырмайды: отынды қоймаға қабылдаудан бастап арнайы техниканың багіне түскенге дейін." data-uz="Neft mahsulotlarini to'liq nazorat qilish majmuasi inson omilini yo'q qiladi: yoqilg'ini omborga qabul qilishdan tortib, maxsus texnikaning bakiga tushishigacha.">Комплекс для полного контроля нефтепродуктов исключает человеческий фактор: от приемки топлива на склад до попадания в бак спецтехники.</p>
+                </div>
+
+                <div class="tech-animation-container">
+                    <div class="anim-sync"></div>
+                </div>
+                
+                <div class="features-list">
+                    <div class="feature-item amber">
+                        <div><span style="font-size: 16px; color: var(--text-main); font-weight: 600; display: inline;" data-ru="Умные заправки" data-en="Smart gas stations" data-kk="Ақылды жанармай құю бекеттері" data-uz="Aqlli yonilg'i quyish shoxobchalari">Умные заправки</span>
+                            <span data-ru="Отпуск топлива с ведомственных АЗС в автоматическом режиме без участия оператора." data-en="Fuel dispensing from departmental gas stations in automatic mode without operator intervention." data-kk="Ведомстволық ЖҚС-тан отынды оператордың қатысуынсыз автоматты режимде беру." data-uz="Idoraviy yoqilg'i quyish shoxobchalaridan yoqilg'ini operator ishtirokisiz avtomatik rejimda tarqatish.">Отпуск топлива с ведомственных АЗС в автоматическом режиме без участия оператора.</span>
+                        </div>
+                    </div>
+                    <div class="feature-item amber">
+                        <div><span style="font-size: 16px; color: var(--text-main); font-weight: 600; display: inline;" data-ru="Синхронизация" data-en="Synchronization" data-kk="Синхрондау" data-uz="Sinxronizatsiya">Синхронизация</span>
+                            <span data-ru="Интеграция систем учета с корпоративными платформами предприятия (1C, SAP) и выписка путевых листов." data-en="Integration of accounting systems with enterprise corporate platforms (1C, SAP) and issuing waybills." data-kk="Есепке алу жүйелерін кәсіпорынның корпоративтік платформаларымен (1С, SAP) біріктіру және жол парақтарын жазып беру." data-uz="Hisob tizimlarini korxonaning korporativ platformalari (1C, SAP) bilan integratsiyalash va yo'l varaqalarini yozish.">Интеграция систем учета с корпоративными платформами предприятия (1C, SAP) и выписка путевых листов.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="images-column">
+                <div class="image-wrapper">
+                    <img src="6.png" alt="Fuel Dispenser Concept">
+                </div>
+                <div class="image-wrapper">
+                    <img src="7.jpg" alt="Agro Infrastructure Diagram">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Шаг 04 -->
+    <section id="step-4">
+        <div class="case-grid">
+            <div class="text-column">
+                <div class="text-content">
+                    <span class="mono" data-ru="Шаг 04. Аналитика" data-en="Step 04. Analytics" data-kk="Қадам 04. Аналитика" data-uz="Qadam 04. Tahlil">Шаг 04. Аналитика</span>
+                    <h2 data-ru="Видеоконтроль и БПЛА" data-en="Video Control and UAVs" data-kk="Бейнебақылау және ҰҰА" data-uz="Video nazorat va UUA">Видеоконтроль и БПЛА</h2>
+                    <p style="margin-bottom: 0;" data-ru="Интеллектуальные камеры и дроны собирают визуальные данные для анализа урожая и защиты периметра, экономя ресурсы хозяйства." data-en="Smart cameras and drones collect visual data for crop analysis and perimeter protection, saving farm resources." data-kk="Зияткерлік камералар мен дрондар өнімді талдау және периметрді қорғау үшін визуалды деректер жинап, шаруашылық ресурстарын үнемдейді." data-uz="Aqlli kameralar va dronlar hosilni tahlil qilish va perimetrni himoya qilish uchun vizual ma'lumotlarni yig'ib, xo'jalik resurslarini tejaydi.">Интеллектуальные камеры и дроны собирают визуальные данные для анализа урожая и защиты периметра, экономя ресурсы хозяйства.</p>
+                </div>
+
+                <div class="tech-animation-container">
+                    <div class="anim-scan"></div>
+                </div>
+                
+                <div class="features-list">
+                    <div class="feature-item cyan">
+                        <div><span style="font-size: 16px; color: var(--text-main); font-weight: 600; display: inline;" data-ru="Анализ полей" data-en="Field Analysis" data-kk="Өрістерді талдау" data-uz="Dalalarni tahlil qilish">Анализ полей</span>
+                            <span data-ru="Прогноз урожайности, оценка густоты посевов и выявление болезней или нехватки влаги." data-en="Yield forecasting, assessment of crop density, and detection of diseases or lack of moisture." data-kk="Өнімділікті болжау, егін қалыңдығын бағалау және ауруларды немесе ылғалдың жетіспеушілігін анықтау." data-uz="Hosildorlikni bashorat qilish, ekin qalinligini baholash va kasalliklarni yoki namlik yetishmasligini aniqlash.">Прогноз урожайности, оценка густоты посевов и выявление болезней или нехватки влаги.</span>
+                        </div>
+                    </div>
+                    <div class="feature-item cyan">
+                        <div><span style="font-size: 16px; color: var(--text-main); font-weight: 600; display: inline;" data-ru="Управление уборкой" data-en="Harvest Management" data-kk="Егін жинауды басқару" data-uz="O'rim-yig'imni boshqarish">Управление уборкой</span>
+                            <span data-ru="Контроль качества обработки, фиксация выгрузок комбайнов и обнаружение посторонних лиц на территории." data-en="Quality control of processing, recording harvester unloadings, and detecting unauthorized persons on the territory." data-kk="Өңдеу сапасын бақылау, комбайндардың түсіруін тіркеу және аумақта бөгде адамдарды анықтау." data-uz="Qayta ishlash sifatini nazorat qilish, kombaynlar yukini tushirishni qayd etish va hududda begona shaxslarni aniqlash.">Контроль качества обработки, фиксация выгрузок комбайнов и обнаружение посторонних лиц на территории.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="images-column">
+                <div class="image-wrapper">
+                    <img src="8.jpeg" alt="Crop Image Recognition">
+                </div>
+                <div class="image-wrapper">
+                    <img src="9.jpg" alt="Combine Harvester">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        let currentLang = 'ru';
+
+        function toggleDropdown(event) {
+            if(event) event.stopPropagation();
+            const content = document.getElementById('langContent');
+            if(content.style.opacity === '1') {
+                content.style.opacity = '0';
+                content.style.visibility = 'hidden';
+                content.style.transform = 'translateY(-10px)';
+            } else {
+                content.style.opacity = '1';
+                content.style.visibility = 'visible';
+                content.style.transform = 'translateY(0)';
+            }
+        }
+
+        function setLang(lang) {
+            currentLang = lang;
+            localStorage.setItem('qidrix_lang', lang);
+            
+            document.getElementById('currentLangDisplay').innerText = lang.toUpperCase();
+            const content = document.getElementById('langContent');
+            content.style.opacity = '0';
+            content.style.visibility = 'hidden';
+            content.style.transform = 'translateY(-10px)';
+            
+            document.querySelectorAll('[data-' + lang + ']').forEach(el => {
+                if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+                    el.placeholder = el.getAttribute('data-' + lang);
+                } else {
+                    el.innerHTML = el.getAttribute('data-' + lang);
+                }
+            });
+            
+            document.querySelectorAll('.lang-dropdown-btn').forEach(btn => {
+                const isMatch = btn.getAttribute('data-lang') === lang;
+                if(isMatch) {
+                    btn.style.background = 'var(--border)';
+                    btn.style.color = 'var(--accent-cyan)';
+                } else {
+                    btn.style.background = 'none';
+                    btn.style.color = 'var(--text-muted)';
+                }
+            });
+        }
+
+        function toggleTheme() {
+            const body = document.documentElement;
+            const currentTheme = body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            body.setAttribute('data-theme', newTheme);
+            localStorage.setItem('qidrix_theme', newTheme);
+            updateThemeIcon(newTheme);
+        }
+
+        function updateThemeIcon(theme) {
+            const themeIcon = document.getElementById('themeIcon');
+            if (theme === 'light') {
+                themeIcon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>';
+            } else {
+                themeIcon.innerHTML = '<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>';
+            }
+        }
+
+        function toggleMenu() {
+            document.getElementById('sidePanel').classList.toggle('open');
+            document.getElementById('panelOverlay').classList.toggle('open');
+            document.body.style.overflow = document.getElementById('sidePanel').classList.contains('open') ? 'hidden' : '';
+        }
+
+        window.onclick = function(event) {
+            if (!event.target.closest('.lang-dropdown')) {
+                const content = document.getElementById('langContent');
+                if(content) {
+                    content.style.opacity = '0';
+                    content.style.visibility = 'hidden';
+                    content.style.transform = 'translateY(-10px)';
+                }
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('qidrix_theme');
+            const currentTheme = savedTheme ? savedTheme : 'dark';
+            document.documentElement.setAttribute('data-theme', currentTheme);
+            updateThemeIcon(currentTheme);
+
+            const savedLang = localStorage.getItem('qidrix_lang');
+            if (savedLang) {
+                setLang(savedLang);
+            } else {
+                setLang('ru');
+            }
+        });
+    </script>
+</body>
+</html>
