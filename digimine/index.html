@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Кейс Qidrix: оцифровка карьерной спецтехники — ретрансляторы, шкафы питания, бортовые системы и телеметрия.">
+    <meta name="theme-color" content="#121417">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23121417'/%3E%3Cpath d='M22 22H70V56H56V36H36V56H56V70H22Z' fill='%23F3F4F6'/%3E%3Crect x='56' y='56' width='22' height='22' fill='%2300E5FF'/%3E%3C/svg%3E">
     <title>Qidrix | Кейс: Цифровой карьер</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
     
@@ -10,10 +13,16 @@
         if ('scrollRestoration' in history) {
             history.scrollRestoration = 'manual';
         }
+        // Якорь из ссылки (например, с подстраницы на #slide-2) запоминаем и прокручиваем после загрузки
+        window.qxHashTarget = window.location.hash;
         if (window.location.hash) {
             window.history.replaceState(null, null, window.location.pathname);
         }
         window.scrollTo(0, 0);
+        // Тему применяем до отрисовки, чтобы не было вспышки светлой темы
+        try {
+            document.documentElement.setAttribute('data-theme', localStorage.getItem('qidrix_theme') || 'dark');
+        } catch (e) {}
     </script>
 
     <style>
@@ -87,7 +96,6 @@
         .logo-text span { color: var(--accent-cyan); }
         
         /* Ссылок меню здесь нет, так как это внутренняя страница кейса */
-        .nav-links { display: none; } 
         
         .nav-right { display: flex; align-items: center; gap: 12px; }
 
@@ -138,11 +146,10 @@
 
         /* === ОСНОВНОЙ КОНТЕНТ === */
         section {
-            min-height: 100vh;
             display: flex;
             flex-direction: column;
             justify-content: center;
-            padding: 100px 10vw 80px; 
+            padding: 60px 8vw;
             border-bottom: 1px solid var(--border);
             position: relative;
         }
@@ -169,6 +176,8 @@
             gap: 60px;
             align-items: stretch;
             width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
         }
 
         .case-grid.reverse {
@@ -322,8 +331,99 @@
             }
             h1 { font-size: 42px; }
             h2 { font-size: 32px; }
-            section { padding: 100px 20px 40px; min-height: auto; }
+            section { padding: 40px 16px; }
             .burger-btn { display: flex; }
+        }
+        /* === ОБЩИЕ ЭЛЕМЕНТЫ САЙТА (единые для всех страниц) === */
+        .svg-fill-main { fill: var(--text-main); transition: 0.4s; }
+        .svg-fill-cyan { fill: var(--accent-cyan); transition: 0.4s; }
+
+        .nav-links { display: flex; gap: 28px; list-style: none; }
+        .nav-links a { color: var(--text-muted); text-decoration: none; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s; }
+        .nav-links a:hover { color: var(--accent-cyan); }
+
+        /* Кнопка входа в демо-карьер */
+        .demo-btn {
+            display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px;
+            background: var(--accent-cyan); color: var(--bg-main); border: 1px solid var(--accent-cyan);
+            border-radius: 20px; font-size: 14px; font-weight: 600; text-decoration: none; white-space: nowrap;
+            box-shadow: 0 0 20px rgba(0, 229, 255, 0.2); transition: 0.3s ease;
+        }
+        .demo-btn:hover { box-shadow: 0 0 30px rgba(0, 229, 255, 0.5); transform: translateY(-3px); }
+        .demo-btn svg { width: 16px; height: 16px; flex-shrink: 0; }
+        .demo-btn.demo-btn-lg { padding: 12px 26px; border-radius: 30px; }
+        .demo-dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; flex-shrink: 0; animation: demo-dot-pulse 2s infinite; }
+        @keyframes demo-dot-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+        .mobile-nav-links .demo-btn { display: inline-flex; color: var(--bg-main); font-size: 16px; }
+        .mobile-nav-links .demo-btn:hover { color: var(--bg-main); }
+
+        /* Главный экран — как на стартовой */
+        #case-hero {
+            position: relative; padding: 0; height: 100vh; min-height: 550px;
+            display: flex; align-items: center; justify-content: center; overflow: hidden;
+        }
+        .hero-bg-video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; }
+        .hero-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2;
+            background: linear-gradient(180deg, rgba(18, 20, 23, 0.75) 0%, rgba(18, 20, 23, 0.9) 100%);
+            transition: background 0.4s ease;
+        }
+        [data-theme="light"] .hero-overlay {
+            background: linear-gradient(180deg, rgba(248, 250, 252, 0.8) 0%, rgba(248, 250, 252, 0.95) 100%);
+        }
+        .hero-content-overlay { position: relative; z-index: 3; text-align: center; max-width: 900px; padding: 0 20px; margin-top: 40px; }
+        .hero-content-overlay h1 { font-size: 60px; letter-spacing: -2px; margin-bottom: 18px; line-height: 1.05; }
+        .hero-content-overlay p { font-size: 18px; margin: 0 auto 28px auto; color: var(--text-muted); max-width: 750px; }
+        .hero-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 14px; }
+        .hero-bounce-btn {
+            display: inline-flex; align-items: center; gap: 10px; padding: 12px 26px;
+            background: var(--bg-panel); color: var(--accent-cyan); border: 1px solid var(--accent-cyan);
+            border-radius: 30px; font-size: 14px; font-weight: 600; text-decoration: none;
+            box-shadow: 0 0 20px rgba(0, 229, 255, 0.2); transition: 0.3s ease;
+            animation: bounce-subtle 2s infinite ease-in-out;
+        }
+        .hero-bounce-btn:hover {
+            background: var(--accent-cyan); color: var(--bg-main);
+            box-shadow: 0 0 30px rgba(0, 229, 255, 0.5); transform: translateY(-3px); animation: none;
+        }
+        @keyframes bounce-subtle {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-8px); }
+            60% { transform: translateY(-4px); }
+        }
+
+        /* Боковые точки навигации */
+        .nav-dots { position: fixed; right: 30px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 15px; z-index: 10; }
+        .nav-dots a { width: 10px; height: 10px; border-radius: 50%; background: var(--text-muted); opacity: 0.3; transition: 0.3s; }
+        .nav-dots a:hover { opacity: 1; background: var(--accent-cyan); box-shadow: 0 0 10px var(--accent-cyan); }
+
+        /* Футер */
+        footer { padding: 60px 20px; text-align: center; border-top: 1px solid var(--border); background: var(--bg-main); position: relative; transition: background-color 0.4s ease; }
+        .footer-content { display: flex; flex-direction: column; align-items: center; gap: 20px; }
+        .footer-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 14px; }
+        .footer-btn {
+            display: inline-flex; align-items: center; gap: 8px; padding: 12px 26px;
+            background: var(--bg-panel); color: var(--text-main); border: 1px solid var(--border);
+            border-radius: 30px; font-size: 14px; font-weight: 600; text-decoration: none; box-shadow: var(--shadow); transition: 0.3s;
+        }
+        .footer-btn:hover { border-color: var(--accent-cyan); color: var(--accent-cyan); }
+        .footer-copy { font-size: 14px; color: var(--text-muted); }
+
+        @media (max-width: 1100px) {
+            .nav-links { display: none; }
+            .burger-btn { display: flex; }
+        }
+        @media (max-width: 768px) {
+            .nav-dots { display: none; }
+            .hero-content-overlay h1 { font-size: 34px; }
+            .hero-content-overlay p { font-size: 15px; margin-bottom: 20px; }
+            footer { padding: 40px 16px; }
+        }
+        @media (max-width: 600px) {
+            header .demo-btn { display: none; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
         }
     </style>
 </head>
@@ -334,15 +434,28 @@
     <header>
         <div class="container">
             <nav>
-                <a href="../index.html" class="logo">
+                <a href="../index.html" class="logo" aria-label="Qidrix">
                     <svg class="logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M 10 10 H 80 V 60 H 60 V 30 H 30 V 60 H 60 V 80 H 10 Z" fill="currentColor" class="svg-fill-main" />
-                        <rect x="60" y="60" width="30" height="30" fill="var(--accent-cyan)" />
+                        <path d="M 10 10 H 80 V 60 H 60 V 30 H 30 V 60 H 60 V 80 H 10 Z" class="svg-fill-main" />
+                        <rect x="60" y="60" width="30" height="30" class="svg-fill-cyan" />
                     </svg>
                     <div class="logo-text">Qidri<span>x</span></div>
                 </a>
 
+                <ul class="nav-links">
+                    <li><a href="../index.html#slide-2" data-ru="Решения" data-en="Solutions" data-kk="Шешімдер" data-uz="Yechimlar">Решения</a></li>
+                    <li><a href="../index.html#slide-3" data-ru="Подход" data-en="Approach" data-kk="Тәсіл" data-uz="Yondashuv">Подход</a></li>
+                    <li><a href="../index.html#slide-4" data-ru="Технологии" data-en="Technologies" data-kk="Технологиялар" data-uz="Texnologiyalar">Технологии</a></li>
+                    <li><a href="../index.html#slide-5" data-ru="Экономика" data-en="Economics" data-kk="Экономика" data-uz="Iqtisodiyot">Экономика</a></li>
+                    <li><a href="../index.html#slide-6" data-ru="Контакты" data-en="Contacts" data-kk="Байланыс" data-uz="Kontaktlar">Контакты</a></li>
+                </ul>
+
                 <div class="nav-right">
+                    <a href="https://qidrixman.github.io/qidrix-karier/demo/" class="demo-btn">
+                        <span class="demo-dot"></span>
+                        <span data-ru="Демо-карьер" data-en="Demo mine" data-kk="Демо-карьер" data-uz="Demo karyer">Демо-карьер</span>
+                    </a>
+
                     <button class="theme-toggle-btn icon-btn" onclick="toggleTheme()" aria-label="Toggle Theme" id="themeBtn">
                         <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
@@ -365,7 +478,7 @@
                             <button class="lang-dropdown-btn active" data-lang="ru" onclick="setLang('ru')"><span class="lang-flag">🇷🇺</span> Русский</button>
                         </div>
                     </div>
-                    
+
                     <button class="burger-btn" onclick="toggleMenu()" aria-label="Menu">
                         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <line x1="3" y1="12" x2="21" y2="12"></line>
@@ -380,7 +493,7 @@
 
     <div class="panel-overlay" id="panelOverlay" onclick="toggleMenu()"></div>
     <div class="side-panel" id="sidePanel">
-        <button class="close-btn" onclick="toggleMenu()">
+        <button class="close-btn" onclick="toggleMenu()" aria-label="Close">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <line x1="18" y1="6" x2="6" y2="18"></line>
                 <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -389,21 +502,43 @@
         <div class="panel-content">
             <ul class="mobile-nav-links">
                 <li><a href="../index.html" onclick="toggleMenu()" data-ru="Вернуться на главную" data-en="Back to Home" data-kk="Басты бетке оралу" data-uz="Asosiy sahifaga qaytish">Вернуться на главную</a></li>
+                <li><a href="../index.html#slide-2" onclick="toggleMenu()" data-ru="Решения" data-en="Solutions" data-kk="Шешімдер" data-uz="Yechimlar">Решения</a></li>
+                <li><a href="../index.html#slide-3" onclick="toggleMenu()" data-ru="Подход" data-en="Approach" data-kk="Тәсіл" data-uz="Yondashuv">Подход</a></li>
+                <li><a href="../index.html#slide-4" onclick="toggleMenu()" data-ru="Технологии" data-en="Technologies" data-kk="Технологиялар" data-uz="Texnologiyalar">Технологии</a></li>
+                <li><a href="../index.html#slide-5" onclick="toggleMenu()" data-ru="Экономика" data-en="Economics" data-kk="Экономика" data-uz="Iqtisodiyot">Экономика</a></li>
+                <li><a href="../index.html#slide-6" onclick="toggleMenu()" data-ru="Контакты" data-en="Contacts" data-kk="Байланыс" data-uz="Kontaktlar">Контакты</a></li>
+                <li><a href="https://qidrixman.github.io/qidrix-karier/demo/" class="demo-btn"><span class="demo-dot"></span><span data-ru="Демо-карьер" data-en="Demo mine" data-kk="Демо-карьер" data-uz="Demo karyer">Демо-карьер</span></a></li>
             </ul>
         </div>
     </div>
 
-    <section>
-        <div class="case-grid">
-            <div class="case-text" style="max-width: 800px;">
-                <span class="mono" data-ru="РЕАЛИЗОВАННЫЙ ПРОЕКТ" data-en="IMPLEMENTED PROJECT" data-kk="ІСКЕ АСЫРЫЛҒАН ЖОБА" data-uz="AMALGA OSHIRILGAN LOYIHA">РЕАЛИЗОВАННЫЙ ПРОЕКТ</span>
-                <h1 data-ru="Оцифровка спецтехники в горных условиях" data-en="Digitization of special equipment in mining conditions" data-kk="Тау-кен жағдайында арнайы техниканы цифрландыру" data-uz="Tog'-kon sharoitida maxsus texnikani raqamlashtirish">Оцифровка спецтехники в горных условиях</h1>
-                <p style="font-size: 24px; color: var(--text-main); margin-bottom: 20px;" data-ru="Интеграция систем АСУ ГТК, высокоточного позиционирования и связи для тяжелой карьерной техники." data-en="Integration of ACS MTC, high-precision positioning and communication systems for heavy mining equipment." data-kk="Ауыр карьерлік техника үшін ТКК АБЖ, жоғары дәлдіктегі позициялау және байланыс жүйелерін біріктіру." data-uz="Og'ir kon texnikasi uchun ATB, yuqori aniqlikdagi joylashuv va aloqa tizimlarini integratsiyalash.">Интеграция систем АСУ ГТК, высокоточного позиционирования и связи для тяжелой карьерной техники.</p>
-                <p data-ru="Комплексный подход к диспетчеризации горнорудного транспорта. От установки автономных ретрансляторов до монтажа бортовых компьютеров и V2X антенн. Связываем оборудование с единым центром управления предприятием." data-en="A comprehensive approach to the dispatching of mining transport. From the installation of autonomous repeaters to the mounting of onboard computers and V2X antennas. We connect the equipment to a single enterprise control center." data-kk="Тау-кен көлігін диспетчерлендірудің кешенді тәсілі. Автономды ретрансляторларды орнатудан бастап борттық компьютерлер мен V2X антенналарын монтаждауға дейін. Біз жабдықты кәсіпорынның бірыңғай басқару орталығымен байланыстырамыз." data-uz="Tog'-kon transportini dispetcherlashtirishga kompleks yondashuv. Avtonom retranslyatorlarni o'rnatishdan tortib, bort kompyuterlari va V2X antennalarini montaj qilishgacha. Uskunalarni korxonaning yagona boshqaruv markaziga ulaymiz.">Комплексный подход к диспетчеризации горнорудного транспорта. От установки автономных ретрансляторов до монтажа бортовых компьютеров и V2X антенн. Связываем оборудование с единым центром управления предприятием.</p>
-            </div>
-            <div class="hero-video-wrapper">
-                <video src="video.mp4" autoplay loop muted playsinline oncanplay="this.playbackRate=0.75"></video>
-            </div>
+    <div class="nav-dots">
+        <a href="#case-hero" title="Начало"></a>
+        <a href="#step-1" title="Инфраструктура"></a>
+        <a href="#step-2" title="Питание"></a>
+        <a href="#step-3" title="Монтаж"></a>
+        <a href="#step-4" title="Телеметрия"></a>
+        <a href="#step-5" title="Операторская среда"></a>
+    </div>
+
+    <!-- КЕЙС: Главный экран (как на стартовой) -->
+    <section id="case-hero">
+        <video autoplay loop muted playsinline class="hero-bg-video" oncanplay="this.playbackRate=0.75">
+            <source src="video.mp4" type="video/mp4">
+        </video>
+
+        <div class="hero-overlay"></div>
+
+        <div class="hero-content-overlay">
+            <span class="mono" data-ru="РЕАЛИЗОВАННЫЙ ПРОЕКТ" data-en="IMPLEMENTED PROJECT" data-kk="ІСКЕ АСЫРЫЛҒАН ЖОБА" data-uz="AMALGA OSHIRILGAN LOYIHA">РЕАЛИЗОВАННЫЙ ПРОЕКТ</span>
+            <h1 data-ru="Оцифровка спецтехники в горных условиях" data-en="Digitization of special equipment in mining conditions" data-kk="Тау-кен жағдайында арнайы техниканы цифрландыру" data-uz="Tog'-kon sharoitida maxsus texnikani raqamlashtirish">Оцифровка спецтехники в горных условиях</h1>
+            <p style="font-size: 20px; color: var(--text-main); margin-bottom: 20px;" data-ru="Интеграция систем АСУ ГТК, высокоточного позиционирования и связи для тяжелой карьерной техники." data-en="Integration of ACS MTC, high-precision positioning and communication systems for heavy mining equipment." data-kk="Ауыр карьерлік техника үшін ТКК АБЖ, жоғары дәлдіктегі позициялау және байланыс жүйелерін біріктіру." data-uz="Og'ir kon texnikasi uchun ATB, yuqori aniqlikdagi joylashuv va aloqa tizimlarini integratsiyalash.">Интеграция систем АСУ ГТК, высокоточного позиционирования и связи для тяжелой карьерной техники.</p>
+            <p data-ru="Комплексный подход к диспетчеризации горнорудного транспорта. От установки автономных ретрансляторов до монтажа бортовых компьютеров и V2X антенн. Связываем оборудование с единым центром управления предприятием." data-en="A comprehensive approach to the dispatching of mining transport. From the installation of autonomous repeaters to the mounting of onboard computers and V2X antennas. We connect the equipment to a single enterprise control center." data-kk="Тау-кен көлігін диспетчерлендірудің кешенді тәсілі. Автономды ретрансляторларды орнатудан бастап борттық компьютерлер мен V2X антенналарын монтаждауға дейін. Біз жабдықты кәсіпорынның бірыңғай басқару орталығымен байланыстырамыз." data-uz="Tog'-kon transportini dispetcherlashtirishga kompleks yondashuv. Avtonom retranslyatorlarni o'rnatishdan tortib, bort kompyuterlari va V2X antennalarini montaj qilishgacha. Uskunalarni korxonaning yagona boshqaruv markaziga ulaymiz.">Комплексный подход к диспетчеризации горнорудного транспорта. От установки автономных ретрансляторов до монтажа бортовых компьютеров и V2X антенн. Связываем оборудование с единым центром управления предприятием.</p>
+
+            <a href="#step-1" class="hero-bounce-btn">
+                <span data-ru="Решения" data-en="Solutions" data-kk="Шешімдер" data-uz="Yechimlar">Решения</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
+            </a>
         </div>
     </section>
 
@@ -430,10 +565,10 @@
             
             <div class="images-row">
                 <div class="image-wrapper">
-                    <img src="IMG_20250708_170304.jpg" alt="Autonomous Relay Station">
+                    <img src="IMG_20250708_170304.webp" loading="lazy" decoding="async" alt="Autonomous Relay Station">
                 </div>
                 <div class="image-wrapper">
-                    <img src="IMG_20250907_085708.jpg" alt="Solar Panel and Cabinet">
+                    <img src="IMG_20250907_085708.webp" loading="lazy" decoding="async" alt="Solar Panel and Cabinet">
                 </div>
             </div>
         </div>
@@ -461,7 +596,7 @@
             </div>
             
             <div class="image-wrapper">
-                <img src="IMG_20250907_085700.jpg" alt="Power Distribution Cabinet Inside">
+                <img src="IMG_20250907_085700.webp" loading="lazy" decoding="async" alt="Power Distribution Cabinet Inside">
             </div>
         </div>
     </section>
@@ -489,10 +624,10 @@
             
             <div class="images-row">
                 <div class="image-wrapper">
-                    <img src="IMG_20250907_090401.jpg" alt="Heavy Machinery Antennas">
+                    <img src="IMG_20250907_090401.webp" loading="lazy" decoding="async" alt="Heavy Machinery Antennas">
                 </div>
                 <div class="image-wrapper">
-                    <img src="IMG_20250715_155110.jpg" alt="Volvo Cabin External Systems">
+                    <img src="IMG_20250715_155110.webp" loading="lazy" decoding="async" alt="Volvo Cabin External Systems">
                 </div>
             </div>
         </div>
@@ -520,7 +655,7 @@
             </div>
             
             <div class="image-wrapper">
-                <img src="IMG_20250907_094329.jpg" alt="Telemetry Open Cabinet on Machinery">
+                <img src="IMG_20250907_094329.webp" loading="lazy" decoding="async" alt="Telemetry Open Cabinet on Machinery">
             </div>
         </div>
     </section>
@@ -548,42 +683,44 @@
             
             <div class="images-group">
                 <div class="image-wrapper">
-                    <img src="IMG_20250907_094407.jpg" alt="Cabin Interior Hexagon System">
+                    <img src="IMG_20250907_094407.webp" loading="lazy" decoding="async" alt="Cabin Interior Hexagon System">
                 </div>
                 <div class="image-wrapper">
-                    <img src="IMG_20250907_094354.jpg" alt="Cabin Dashboard and Camera">
+                    <img src="IMG_20250907_094354.webp" loading="lazy" decoding="async" alt="Cabin Dashboard and Camera">
                 </div>
             </div>
         </div>
     </section>
 
+    <footer>
+        <div class="container footer-content">
+            <div class="footer-actions">
+                <a href="../index.html#slide-2" class="footer-btn"><span data-ru="← Все решения" data-en="← All solutions" data-kk="← Барлық шешімдер" data-uz="← Barcha yechimlar">← Все решения</span></a>
+                <a href="#case-hero" class="hero-bounce-btn">
+                    <span data-ru="Наверх" data-en="To Top" data-kk="Жоғары" data-uz="Yuqoriga">Наверх</span>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+                </a>
+            </div>
+            <div class="footer-copy" data-ru="Qidrix &copy; 2026. Все права защищены." data-en="Qidrix &copy; 2026. All rights reserved." data-kk="Qidrix &copy; 2026. Барлық құқықтар қорғалған." data-uz="Qidrix &copy; 2026. Barcha huquqlar himoyalangan.">Qidrix &copy; 2026. Все права защищены.</div>
+        </div>
+    </footer>
+
     <script>
         let currentLang = 'ru';
 
         function toggleDropdown(event) {
-            if(event) event.stopPropagation();
-            const content = document.getElementById('langContent');
-            if(content.style.opacity === '1') {
-                content.style.opacity = '0';
-                content.style.visibility = 'hidden';
-                content.style.transform = 'translateY(-10px)';
-            } else {
-                content.style.opacity = '1';
-                content.style.visibility = 'visible';
-                content.style.transform = 'translateY(0)';
-            }
+            if (event) event.stopPropagation();
+            document.getElementById('langContent').classList.toggle('show');
         }
 
         function setLang(lang) {
             currentLang = lang;
-            localStorage.setItem('qidrix_lang', lang);
-            
+            try { localStorage.setItem('qidrix_lang', lang); } catch (e) {}
+            document.documentElement.lang = lang;
+
             document.getElementById('currentLangDisplay').innerText = lang.toUpperCase();
-            const content = document.getElementById('langContent');
-            content.style.opacity = '0';
-            content.style.visibility = 'hidden';
-            content.style.transform = 'translateY(-10px)';
-            
+            document.getElementById('langContent').classList.remove('show');
+
             document.querySelectorAll('[data-' + lang + ']').forEach(el => {
                 if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
                     el.placeholder = el.getAttribute('data-' + lang);
@@ -591,25 +728,17 @@
                     el.innerHTML = el.getAttribute('data-' + lang);
                 }
             });
-            
+
             document.querySelectorAll('.lang-dropdown-btn').forEach(btn => {
-                const isMatch = btn.getAttribute('data-lang') === lang;
-                if(isMatch) {
-                    btn.style.background = 'var(--border)';
-                    btn.style.color = 'var(--accent-cyan)';
-                } else {
-                    btn.style.background = 'none';
-                    btn.style.color = 'var(--text-muted)';
-                }
+                btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
             });
         }
 
         function toggleTheme() {
-            const body = document.documentElement;
-            const currentTheme = body.getAttribute('data-theme');
-            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-            body.setAttribute('data-theme', newTheme);
-            localStorage.setItem('qidrix_theme', newTheme);
+            const root = document.documentElement;
+            const newTheme = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+            root.setAttribute('data-theme', newTheme);
+            try { localStorage.setItem('qidrix_theme', newTheme); } catch (e) {}
             updateThemeIcon(newTheme);
         }
 
@@ -630,26 +759,31 @@
 
         window.onclick = function(event) {
             if (!event.target.closest('.lang-dropdown')) {
-                const content = document.getElementById('langContent');
-                if(content) {
-                    content.style.opacity = '0';
-                    content.style.visibility = 'hidden';
-                    content.style.transform = 'translateY(-10px)';
-                }
+                document.getElementById('langContent').classList.remove('show');
             }
         }
 
+        document.addEventListener('keydown', event => {
+            if (event.key !== 'Escape') return;
+            document.getElementById('langContent').classList.remove('show');
+            if (document.getElementById('sidePanel').classList.contains('open')) toggleMenu();
+        });
+
         document.addEventListener('DOMContentLoaded', () => {
-            const savedTheme = localStorage.getItem('qidrix_theme');
+            let savedTheme = null, savedLang = null;
+            try {
+                savedTheme = localStorage.getItem('qidrix_theme');
+                savedLang = localStorage.getItem('qidrix_lang');
+            } catch (e) {}
+
             const currentTheme = savedTheme ? savedTheme : 'dark';
             document.documentElement.setAttribute('data-theme', currentTheme);
             updateThemeIcon(currentTheme);
+            setLang(savedLang ? savedLang : 'ru');
 
-            const savedLang = localStorage.getItem('qidrix_lang');
-            if (savedLang) {
-                setLang(savedLang);
-            } else {
-                setLang('ru');
+            if (window.qxHashTarget) {
+                const target = document.getElementById(window.qxHashTarget.slice(1));
+                if (target) setTimeout(() => target.scrollIntoView(), 60);
             }
         });
     </script>
