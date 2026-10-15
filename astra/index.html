@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Кейс Qidrix × Astrawireless: беспроводная сеть SCADA и телеметрии для объектов электросетей 6/10 кВ.">
+    <link rel="canonical" href="https://qidrix.asia/astra/">
     <meta name="theme-color" content="#121417">
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23121417'/%3E%3Cpath d='M22 22H70V56H56V36H36V56H56V70H22Z' fill='%23F3F4F6'/%3E%3Crect x='56' y='56' width='22' height='22' fill='%2300E5FF'/%3E%3C/svg%3E">
     <title>Qidrix | Кейс: Astrawireless SCADA</title>
@@ -554,7 +555,7 @@
     <header>
         <div class="container">
             <nav>
-                <a href="../index.html" class="logo" aria-label="Qidrix">
+                <a href="../" class="logo" aria-label="Qidrix">
                     <svg class="logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
                         <path d="M 10 10 H 80 V 60 H 60 V 30 H 30 V 60 H 60 V 80 H 10 Z" class="svg-fill-main" />
                         <rect x="60" y="60" width="30" height="30" class="svg-fill-cyan" />
@@ -563,7 +564,7 @@
                 </a>
 
                 <ul class="nav-links case-nav">
-                    <li><a href="../index.html#slide-2" class="nav-back" data-ru="← Все кейсы" data-en="← All cases" data-kk="← Барлық кейстер" data-uz="← Barcha keyslar">← Все кейсы</a></li>
+                    <li><a href="../#slide-2" class="nav-back" data-ru="← Все кейсы" data-en="← All cases" data-kk="← Барлық кейстер" data-uz="← Barcha keyslar">← Все кейсы</a></li>
                     <li class="nav-sep" aria-hidden="true"></li>
                     <li><a href="#step-1" data-ru="Инфраструктура" data-en="Infrastructure" data-kk="Инфрақұрылым" data-uz="Infratuzilma">Инфраструктура</a></li>
                     <li><a href="#step-2" data-ru="Технологии" data-en="Technologies" data-kk="Технологиялар" data-uz="Texnologiyalar">Технологии</a></li>
@@ -622,13 +623,13 @@
         </button>
         <div class="panel-content">
             <ul class="mobile-nav-links">
-                <li><a href="../index.html" onclick="toggleMenu()" data-ru="Вернуться на главную" data-en="Back to Home" data-kk="Басты бетке оралу" data-uz="Asosiy sahifaga qaytish">Вернуться на главную</a></li>
+                <li><a href="../" onclick="toggleMenu()" data-ru="Вернуться на главную" data-en="Back to Home" data-kk="Басты бетке оралу" data-uz="Asosiy sahifaga qaytish">Вернуться на главную</a></li>
                 <li class="nav-sep" aria-hidden="true"></li>
                 <li><a href="#step-1" onclick="toggleMenu()" data-ru="Инфраструктура" data-en="Infrastructure" data-kk="Инфрақұрылым" data-uz="Infratuzilma">Инфраструктура</a></li>
                 <li><a href="#step-2" onclick="toggleMenu()" data-ru="Технологии" data-en="Technologies" data-kk="Технологиялар" data-uz="Texnologiyalar">Технологии</a></li>
                 <li><a href="#step-3" onclick="toggleMenu()" data-ru="Преимущества" data-en="Advantages" data-kk="Артықшылықтар" data-uz="Afzalliklar">Преимущества</a></li>
                 <li><a href="#step-4" onclick="toggleMenu()" data-ru="Интеграция" data-en="Integration" data-kk="Интеграция" data-uz="Integratsiya">Интеграция</a></li>
-                <li><a href="../index.html#slide-6" onclick="toggleMenu()" data-ru="Контакты" data-en="Contacts" data-kk="Байланыс" data-uz="Kontaktlar">Контакты</a></li>
+                <li><a href="../#slide-6" onclick="toggleMenu()" data-ru="Контакты" data-en="Contacts" data-kk="Байланыс" data-uz="Kontaktlar">Контакты</a></li>
                 <li><a href="https://qidrixman.github.io/qidrix-karier/demo/" class="demo-btn"><span class="demo-dot"></span><span data-ru="Демо-карьер" data-en="Demo mine" data-kk="Демо-карьер" data-uz="Demo karyer">Демо-карьер</span></a></li>
             </ul>
         </div>
@@ -848,7 +849,7 @@
     <footer>
         <div class="container footer-content">
             <div class="footer-actions">
-                <a href="../index.html#slide-2" class="footer-btn"><span data-ru="← Все решения" data-en="← All solutions" data-kk="← Барлық шешімдер" data-uz="← Barcha yechimlar">← Все решения</span></a>
+                <a href="../#slide-2" class="footer-btn"><span data-ru="← Все решения" data-en="← All solutions" data-kk="← Барлық шешімдер" data-uz="← Barcha yechimlar">← Все решения</span></a>
                 <a href="#case-hero" class="hero-bounce-btn">
                     <span data-ru="Наверх" data-en="To Top" data-kk="Жоғары" data-uz="Yuqoriga">Наверх</span>
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
@@ -922,6 +923,24 @@
                 document.getElementById('langContent').classList.remove('show');
             }
         }
+
+        // Переходы по якорям без «#» в адресной строке; логотип на главной прокручивает наверх
+        document.addEventListener('click', event => {
+            const a = event.target.closest('a[href]');
+            if (!a || event.metaKey || event.ctrlKey || event.shiftKey) return;
+            const href = a.getAttribute('href');
+            if (href === './' && a.classList.contains('logo') && document.getElementById('slide-1')) {
+                event.preventDefault();
+                window.scrollTo({ top: 0 });
+                return;
+            }
+            if (!href.startsWith('#') || href.length < 2) return;
+            const target = document.getElementById(href.slice(1));
+            if (!target) return;
+            event.preventDefault();
+            if (href === '#slide-1' || href === '#case-hero') window.scrollTo({ top: 0 });
+            else target.scrollIntoView();
+        });
 
         document.addEventListener('keydown', event => {
             if (event.key !== 'Escape') return;
