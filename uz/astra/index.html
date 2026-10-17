@@ -528,6 +528,9 @@
         .flyover-frame { position: relative; width: 100%; height: 100%; }
         .flyover-frame iframe { display: block; width: 100%; height: 100%; border: 0; background: #121417; }
         .flyover-frame:fullscreen { height: 100vh; }
+        .flyover-frame.is-full { position: fixed; inset: 0; z-index: 3000; height: 100vh; height: 100dvh; background: #121417; }
+        .flyover-frame.is-full .flyover-full { top: calc(12px + env(safe-area-inset-top)); right: 12px; }
+        html.qx-flyover-full, html.qx-flyover-full body { overflow: hidden; }
         .flyover-full {
             position: absolute; right: 16px; top: 16px; z-index: 2; width: 40px; height: 40px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center; cursor: pointer;
@@ -648,7 +651,7 @@
     <section id="case-hero" class="flyover-section">
         <h1 class="visually-hidden" data-ru="Внедрение SCADA и телеметрии" data-en="SCADA and Telemetry Implementation" data-kk="SCADA және телеметрияны енгізу" data-uz="SCADA va telemetriyani joriy etish">SCADA va telemetriyani joriy etish</h1>
         <div class="flyover-frame" id="flyoverFrame">
-            <iframe id="flyover" data-src="../../astra/flyover/index.html?v=1220b048" title="Parvoz: Qarag‘andaning simsiz SCADA tarmog‘i" allow="fullscreen"></iframe>
+            <iframe id="flyover" data-src="../../astra/flyover/index.html?v=5a7bb524" title="Parvoz: Qarag‘andaning simsiz SCADA tarmog‘i" allow="fullscreen"></iframe>
             <button type="button" class="flyover-full" id="flyoverFull" aria-label="To‘liq ekran" title="To‘liq ekran" hidden>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3" /></svg>
             </button>
@@ -986,10 +989,26 @@
             }
             const box = document.getElementById('flyoverFrame');
             const full = document.getElementById('flyoverFull');
-            if (document.fullscreenEnabled && box.requestFullscreen) {
-                full.hidden = false;
-                full.addEventListener('click', () => (document.fullscreenElement ? document.exitFullscreen() : box.requestFullscreen()).catch(() => {}));
-            }
+            // На весь экран: на ПК — системный режим; на iPhone он работает только для видео,
+            // поэтому на телефонах и при отказе браузера пролёт растягивается поверх страницы.
+            const icon = full.innerHTML;
+            const closeIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+            const native = document.fullscreenEnabled && box.requestFullscreen && !matchMedia('(pointer: coarse)').matches;
+            const setPseudo = (on) => {
+                box.classList.toggle('is-full', on);
+                document.documentElement.classList.toggle('qx-flyover-full', on);
+                full.innerHTML = on ? closeIcon : icon;
+            };
+            full.hidden = false;
+            full.addEventListener('click', () => {
+                if (box.classList.contains('is-full')) return setPseudo(false);
+                if (native) {
+                    if (document.fullscreenElement) return void document.exitFullscreen().catch(() => {});
+                    return void box.requestFullscreen().catch(() => setPseudo(true));
+                }
+                setPseudo(true);
+            });
+            document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && box.classList.contains('is-full')) setPseudo(false); });
         })();
 
         document.addEventListener('keydown', event => {
