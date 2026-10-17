@@ -106,51 +106,44 @@ html.motion .hero-bg-video { transform: translate3d(0, var(--parallax, 0px), 0) 
 }
 
 /* ─── Футер (общий для всех страниц) ─────────────────────────────────────── */
-footer.qx-foot { text-align: left; padding: 72px 0 28px; overflow: hidden; }
+footer.qx-foot { position: relative; text-align: left; padding: 64px 0 28px; border-top: 0; overflow: hidden; }
+footer.qx-foot::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--accent-cyan) 30%, #C2FF41 70%, transparent); opacity: 0.6; }
 .qx-foot nav { display: block; height: auto; }
-.qx-foot__grid { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.25fr); gap: 40px 44px; }
-.qx-foot__brand .logo { margin-bottom: 18px; }
-.qx-foot__about { max-width: 380px; color: var(--text-muted); font-size: 14px; line-height: 1.6; margin-bottom: 14px; }
-.qx-foot__geo { display: inline-block; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--accent-cyan); margin: 0; }
-.qx-foot__h { font-family: 'Fira Code', monospace; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 18px; }
-.qx-foot__col ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
-.qx-foot__col ul a { position: relative; color: var(--text-main); text-decoration: none; font-size: 15px; font-weight: 500; display: inline-flex; align-items: center; gap: 8px; transition: color .25s; }
+.qx-foot__grid { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.9fr) minmax(0, 0.9fr) minmax(0, 1.25fr); gap: 32px 40px; align-items: start; }
+.qx-foot__brand .logo { margin-bottom: 16px; }
+.qx-foot__brand .logo-svg { width: 32px; height: 32px; }
+.qx-foot__brand .logo-text { font-size: 23px; }
+.qx-foot__about { max-width: 340px; color: var(--text-muted); font-size: 14px; line-height: 1.6; margin: 0 0 12px; }
+.qx-foot__geo { display: inline-block; font-size: 10.5px; letter-spacing: 2px; text-transform: uppercase; color: var(--accent-cyan); margin: 0; }
+.qx-foot__h { font-family: 'Fira Code', monospace; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); margin: 6px 0 16px; }
+.qx-foot__col ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 11px; }
+.qx-foot__col ul a { position: relative; color: var(--text-main); text-decoration: none; font-size: 14.5px; font-weight: 500; transition: color .25s; }
 .qx-foot__col ul a::after { content: ""; position: absolute; left: 0; right: 0; bottom: -3px; height: 1px; background: var(--accent-cyan); transform: scaleX(0); transform-origin: left; transition: transform .35s cubic-bezier(.2,.7,.2,1); }
 .qx-foot__col ul a:hover, .qx-foot__col ul a[aria-current="page"] { color: var(--accent-cyan); }
 .qx-foot__col ul a:hover::after, .qx-foot__col ul a[aria-current="page"]::after { transform: scaleX(1); }
-.qx-foot__demo .demo-dot { margin: 0; background: var(--accent-cyan); box-shadow: 0 0 8px var(--accent-cyan); }
-.qx-foot__cta { display: inline-flex; align-items: center; gap: 10px; padding: 12px 22px; margin-bottom: 20px; border-radius: 30px; background: var(--accent-cyan); color: var(--bg-main); font-weight: 700; font-size: 14px; text-decoration: none; box-shadow: 0 0 20px rgba(0, 229, 255, 0.25); transition: transform .3s, box-shadow .3s; }
-.qx-foot__cta:hover { transform: translateY(-3px); box-shadow: 0 0 30px rgba(0, 229, 255, 0.5); }
-.qx-foot .footer-social { justify-content: flex-start; flex-wrap: nowrap; gap: 8px; }
-.qx-foot .footer-social-link { width: 38px; height: 38px; flex: none; }
-
-/* Крупная надпись: едва заметная заливка, под курсором — подсветка фирменным циановым. */
-.qx-foot__mark { --mx: 50%; --my: 60%; margin: 56px 0 8px; font-weight: 800; font-size: clamp(72px, 19vw, 260px); line-height: .9; letter-spacing: -0.06em; text-align: center; user-select: none; white-space: nowrap;
-    color: transparent;
-    background: radial-gradient(320px circle at var(--mx) var(--my), rgba(0, 229, 255, 0.5), rgba(0, 229, 255, 0) 70%), linear-gradient(180deg, rgba(243, 244, 246, 0.07), rgba(243, 244, 246, 0.015));
-    -webkit-background-clip: text; background-clip: text; }
-[data-theme="light"] .qx-foot__mark { background-image: radial-gradient(320px circle at var(--mx) var(--my), rgba(2, 132, 199, 0.45), rgba(2, 132, 199, 0) 70%), linear-gradient(180deg, rgba(15, 23, 42, 0.07), rgba(15, 23, 42, 0.015)); }
-/* На телефоне курсора нет — подсветка медленно проходит по надписи сама. */
-@property --mx { syntax: '<length-percentage>'; inherits: false; initial-value: 50%; }
-@keyframes qx-mark-sweep { from { --mx: -10%; } to { --mx: 110%; } }
-@media (hover: none) and (prefers-reduced-motion: no-preference) { .qx-foot__mark { animation: qx-mark-sweep 7s ease-in-out infinite alternate; } }
-
-.qx-foot__bottom { display: flex; align-items: center; justify-content: space-between; gap: 16px 24px; flex-wrap: wrap; padding-top: 22px; border-top: 1px solid var(--border); }
-.qx-foot__bottom .footer-copy { font-size: 13px; }
-.qx-foot nav.qx-foot__langs { display: flex; gap: 4px; }
-.qx-foot__langs a { font-family: 'Fira Code', monospace; font-size: 12px; letter-spacing: 1px; padding: 6px 10px; border-radius: 20px; color: var(--text-muted); text-decoration: none; border: 1px solid transparent; transition: .25s; }
+/* Карточка «Связаться» */
+.qx-foot__grid > .qx-foot__col:last-child { padding: 20px; border-radius: 16px; background: var(--bg-panel); border: 1px solid var(--border); }
+.qx-foot__grid > .qx-foot__col:last-child .qx-foot__h { margin-top: 0; }
+.qx-foot__cta { display: flex; justify-content: center; align-items: center; gap: 10px; width: 100%; padding: 12px 20px; margin-bottom: 14px; border-radius: 30px; background: var(--accent-cyan); color: var(--bg-main); font-weight: 700; font-size: 14px; text-decoration: none; box-shadow: 0 0 20px rgba(0, 229, 255, 0.2); transition: transform .3s, box-shadow .3s; }
+.qx-foot__cta:hover { transform: translateY(-2px); box-shadow: 0 0 30px rgba(0, 229, 255, 0.45); }
+.qx-foot .footer-social { justify-content: space-between; flex-wrap: nowrap; gap: 6px; }
+.qx-foot .footer-social-link { width: 40px; height: 40px; flex: none; }
+/* Нижняя строка */
+.qx-foot__bottom { display: flex; align-items: center; gap: 16px 24px; margin-top: 44px; padding-top: 20px; border-top: 1px solid var(--border); }
+.qx-foot__bottom .footer-copy { margin-right: auto; font-size: 12.5px; line-height: 1.45; min-width: 0; }
+.qx-foot nav.qx-foot__langs { display: flex; flex: none; gap: 0; padding: 3px; border-radius: 20px; border: 1px solid var(--border); background: var(--bg-panel); }
+.qx-foot__langs a { font-family: 'Fira Code', monospace; font-size: 11px; letter-spacing: 1px; padding: 5px 10px; border-radius: 16px; color: var(--text-muted); text-decoration: none; transition: .25s; }
 .qx-foot__langs a:hover { color: var(--accent-cyan); }
-.qx-foot__langs a[aria-current="true"] { color: var(--accent-cyan); border-color: var(--accent-cyan); }
-.qx-foot__up { display: inline-flex; align-items: center; gap: 8px; color: var(--text-muted); font-size: 13px; font-weight: 600; text-decoration: none; transition: color .25s; }
-.qx-foot__up:hover { color: var(--accent-cyan); }
-.qx-foot__up svg { transition: transform .3s; }
-.qx-foot__up:hover svg { transform: translateY(-3px); }
+.qx-foot__langs a[aria-current="true"] { background: var(--accent-cyan); color: var(--bg-main); }
+.qx-foot__up { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--border); background: var(--bg-panel); color: var(--text-main); transition: color .25s, border-color .25s, transform .3s; }
+.qx-foot__up:hover { color: var(--accent-cyan); border-color: var(--accent-cyan); transform: translateY(-3px); }
+.qx-foot__up span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
 @media (max-width: 960px) {
     .qx-foot__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .qx-foot__brand { grid-column: 1 / -1; }
 }
-/* Телефон: компактный футер — бренд, карточка связи, две колонки ссылок, строка с языками. */
+/* Телефон: бренд, карточка связи, две колонки ссылок, строка с языками; «Наверх» — у бренда. */
 @media (max-width: 560px) {
     footer.qx-foot { padding: 40px 0 calc(20px + env(safe-area-inset-bottom)); }
     .qx-foot .container { position: relative; }
@@ -161,22 +154,16 @@ footer.qx-foot { text-align: left; padding: 72px 0 28px; overflow: hidden; }
     .qx-foot__brand .logo-text { font-size: 22px; }
     .qx-foot__about { font-size: 13.5px; line-height: 1.55; margin-bottom: 10px; }
     .qx-foot__geo { font-size: 10px; }
-    .qx-foot__grid > .qx-foot__col:last-child { order: 1; grid-column: 1 / -1; padding: 18px; border-radius: 16px; background: var(--bg-panel); border: 1px solid var(--border); }
+    .qx-foot__grid > .qx-foot__col:last-child { order: 1; grid-column: 1 / -1; padding: 18px; }
     .qx-foot__col { order: 2; }
-    .qx-foot__h { font-size: 10.5px; margin-bottom: 12px; }
-    .qx-foot__col ul { gap: 11px; }
+    .qx-foot__h { font-size: 10.5px; margin: 0 0 12px; }
     .qx-foot__col ul a { font-size: 14px; }
-    .qx-foot__cta { display: flex; justify-content: center; width: 100%; margin-bottom: 14px; padding: 13px 20px; }
-    .qx-foot .footer-social { justify-content: space-between; gap: 0; }
+    .qx-foot__cta { padding: 13px 20px; }
+    .qx-foot .footer-social { gap: 0; }
     .qx-foot .footer-social-link { width: 44px; height: 44px; }
-    .qx-foot__mark { display: none; }
-    .qx-foot__bottom { margin-top: 28px; padding-top: 18px; flex-wrap: nowrap; }
-    .qx-foot__bottom .footer-copy { font-size: 11.5px; line-height: 1.45; min-width: 0; }
-    .qx-foot nav.qx-foot__langs { flex: none; gap: 0; padding: 3px; border-radius: 20px; border: 1px solid var(--border); background: var(--bg-panel); }
-    .qx-foot__langs a { padding: 5px 9px; font-size: 11px; border: 0; }
-    .qx-foot__langs a[aria-current="true"] { background: var(--accent-cyan); color: var(--bg-main); }
-    .qx-foot__up { position: absolute; top: 0; right: 20px; width: 42px; height: 42px; justify-content: center; border-radius: 50%; border: 1px solid var(--border); background: var(--bg-panel); color: var(--text-main); }
-    .qx-foot__up span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+    .qx-foot__bottom { margin-top: 28px; padding-top: 18px; }
+    .qx-foot__bottom .footer-copy { font-size: 11.5px; }
+    .qx-foot__up { position: absolute; top: 0; right: 20px; width: 42px; height: 42px; }
 }
 
 /* Закрытое боковое меню: без тени у края экрана и вне порядка Tab. */
