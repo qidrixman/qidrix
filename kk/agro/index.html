@@ -48,15 +48,6 @@
             window.history.replaceState(null, null, window.location.pathname);
         }
         window.scrollTo(0, 0);
-        // Посетитель раньше выбрал другой язык и пришёл извне — сразу открываем его версию страницы.
-        // Поисковые роботы ничего не хранят, поэтому всегда видят страницу по её адресу.
-        try {
-            var qxSaved = localStorage.getItem('qidrix_lang'), qxHtml = document.documentElement;
-            var qxExternal = !document.referrer || new URL(document.referrer).origin !== location.origin;
-            if (qxHtml.lang === 'ru' && qxExternal && /^(en|kk|uz)$/.test(qxSaved || '') && qxHtml.dataset.root !== undefined) {
-                location.replace(qxHtml.dataset.root + qxSaved + '/' + qxHtml.dataset.page + (window.qxHashTarget || ''));
-            }
-        } catch (e) {}
         // Тему применяем до отрисовки, чтобы не было вспышки светлой темы
         try {
             document.documentElement.setAttribute('data-theme', localStorage.getItem('qidrix_theme') || 'dark');
@@ -878,7 +869,6 @@
                 return;
             }
             currentLang = lang;
-            try { localStorage.setItem('qidrix_lang', lang); } catch (e) {}
             document.documentElement.lang = lang;
 
             document.getElementById('currentLangDisplay').innerText = lang.toUpperCase();
