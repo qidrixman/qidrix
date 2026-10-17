@@ -12,9 +12,11 @@
   var NS = 'http://www.w3.org/2000/svg';
   var COS = Math.cos(Math.PI / 6);
   var SIN = 0.5;
-  var S = 26; // пикселей на единицу поля
+  var S = 24; // пикселей на единицу поля
   var OX = 300; // центр сцены в viewBox 600 × 440
-  var OY = 120;
+  var OY = 96;
+  /** Место для подписи-легенды: левый нижний угол, вне поля. */
+  var LEGEND = [22, 414];
   var REDUCED = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // ─── Подписи на 4 языках ────────────────────────────────────────────────
@@ -449,7 +451,7 @@
       for (var wi = 0; wi < trTrack.points.length; wi++) { var q = trTrack.points[wi]; if (Math.abs(q[1] - yl) < 0.02 && Math.abs(q[0] - (endX === xe ? xe : xs)) < 0.06) { workEnd = wi; } }
       var trail = el('polyline', { fill: 'none', stroke: C.lime, 'stroke-width': 5, 'stroke-linecap': 'round', 'stroke-linejoin': 'round', opacity: 0.55 }, g);
       var tractorV = vehicle(g, C.green, false);
-      var zoneChip = chip(svg, [P(1, 11, 0)[0] - 10, P(1, 11, 0)[1] + 18], 'zone', '#00E5FF');
+      var zoneChip = chip(svg, LEGEND, 'zone', '#00E5FF');
       var cardT = card(host);
             var last = -1;
       return {
@@ -512,7 +514,7 @@
       var sp = [P(4, 4, 3.4)[0], P(4, 4, 3.4)[1] - 30];
       el('path', { d: 'M' + (sp[0] - 18) + ' ' + (sp[1] + 8) + ' a10 10 0 0 1 4 -18 a13 13 0 0 1 24 4 a8 8 0 0 1 2 14 z', fill: 'rgba(14,16,19,0.9)', stroke: '#00E5FF', 'stroke-width': 1.4 }, syncG);
       var syncT = el('text', { x: sp[0] + 26, y: sp[1] + 2, fill: '#00E5FF', 'font-size': 12, 'font-family': 'Fira Code, monospace' }, syncG);
-      var station = chip(svg, [P(2, 7, 0)[0] - 40, P(2, 7, 0)[1] + 20], 'station', 'var(--accent-amber)');
+      var station = chip(svg, LEGEND, 'station', 'var(--accent-amber)');
       var cardF = card(host);
       var lastShown = '';
       return {
@@ -591,7 +593,7 @@
       var detT = el('text', { x: person[0] + 14, y: person[1] - 14, fill: '#FFB4AB', 'font-size': 12, 'font-family': 'Inter, sans-serif', 'font-weight': 600 }, det);
       el('line', { x1: person[0], y1: person[1] - 2, x2: person[0], y2: person[1] - 14, stroke: '#E5E7EB', 'stroke-width': 3, 'stroke-linecap': 'round' }, svg);
       el('circle', { cx: person[0], cy: person[1] - 18, r: 3.2, fill: '#E5E7EB' }, svg);
-      var legend = chip(svg, [P(1, 11, 0)[0] - 30, P(1, 11, 0)[1] + 20], 'ndvi', '#22C55E');
+      var legend = chip(svg, LEGEND, 'ndvi', '#22C55E');
       var cardD = card(host);
       var lastPct = -1;
       return {

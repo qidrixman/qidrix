@@ -8,9 +8,9 @@ Languages: Russian (default), English, Kazakh, Uzbek.
 
 ## Case studies
 
-- [Digital Mine: Mining Fleet Digitization — Case Study](https://qidrix.asia/en/digimine/): Qidrix case study: open-pit radio network and repeaters, fail-safe power cabinets, onboard computers and V2X antennas on haul trucks, telemetry and mining fleet dispatching.
-- [6/10 kV SCADA for the Karaganda Power Grid — Case](https://qidrix.asia/en/astra/): How Qidrix and Astrawireless built a wireless SCADA and telemetry network for Karaganda Zharyk: 30 base stations, 1,847 subscriber stations, 15 grid districts. Interactive 3D fly-over.
-- [Digital Farming: Fleet Telemetry & Fuel Control — Case](https://qidrix.asia/en/agro/): Qidrix case study: field connectivity, tractor and combine telemetry, automated fuel accounting, video monitoring and drones for an agricultural enterprise. Turnkey delivery.
+- [Mining Fleet Digitalization — Case Study](https://qidrix.asia/en/digimine/): Qidrix case study: open-pit radio network and repeaters, fail-safe power cabinets, onboard computers and V2X antennas on haul trucks, telemetry and mining fleet dispatching.
+- [SCADA for the Karaganda Power Grid — Case Study](https://qidrix.asia/en/astra/): How Qidrix and Astrawireless built a wireless SCADA and telemetry network for Karaganda Zharyk: 30 base stations, 1,847 subscriber stations, 15 grid districts. Interactive 3D fly-over.
+- [Agribusiness Digitalization — Case Study](https://qidrix.asia/en/agro/): Qidrix case study: field connectivity, tractor and combine telemetry, automated fuel accounting, video monitoring and drones for an agricultural enterprise. Turnkey delivery.
 
 ## Pages
 
