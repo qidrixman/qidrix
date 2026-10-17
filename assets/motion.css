@@ -88,3 +88,76 @@ html.motion .hero-bg-video { transform: translate3d(0, var(--parallax, 0px), 0) 
     section.is-landing .mono, section.is-landing::before { animation: none !important; }
     html.motion .hero-bg-video { transform: none !important; }
 }
+
+/* Первый экран с видео — всегда «тёмный», как в тёмной теме: без белой пелены в светлой теме */
+[data-theme="light"] #slide-1,
+[data-theme="light"] #case-hero {
+    --text-main: #F3F4F6;
+    --text-muted: #C3C9D2;
+    --accent-cyan: #00E5FF;
+    --bg-panel: #1E2126;
+    --bg-main: #121417;
+    color: #F3F4F6;
+    background: #121417;
+}
+[data-theme="light"] #slide-1 .hero-overlay,
+[data-theme="light"] #case-hero .hero-overlay {
+    background: linear-gradient(180deg, rgba(18, 20, 23, 0.72) 0%, rgba(18, 20, 23, 0.9) 100%) !important;
+}
+
+/* ─── Футер (общий для всех страниц) ─────────────────────────────────────── */
+footer.qx-foot { text-align: left; padding: 72px 0 28px; overflow: hidden; }
+.qx-foot nav { display: block; height: auto; }
+.qx-foot__grid { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.25fr); gap: 40px 44px; }
+.qx-foot__brand .logo { margin-bottom: 18px; }
+.qx-foot__about { max-width: 380px; color: var(--text-muted); font-size: 14px; line-height: 1.6; margin-bottom: 14px; }
+.qx-foot__geo { display: inline-block; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--accent-cyan); margin: 0; }
+.qx-foot__h { font-family: 'Fira Code', monospace; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 18px; }
+.qx-foot__col ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.qx-foot__col ul a { position: relative; color: var(--text-main); text-decoration: none; font-size: 15px; font-weight: 500; display: inline-flex; align-items: center; gap: 8px; transition: color .25s; }
+.qx-foot__col ul a::after { content: ""; position: absolute; left: 0; right: 0; bottom: -3px; height: 1px; background: var(--accent-cyan); transform: scaleX(0); transform-origin: left; transition: transform .35s cubic-bezier(.2,.7,.2,1); }
+.qx-foot__col ul a:hover, .qx-foot__col ul a[aria-current="page"] { color: var(--accent-cyan); }
+.qx-foot__col ul a:hover::after, .qx-foot__col ul a[aria-current="page"]::after { transform: scaleX(1); }
+.qx-foot__demo .demo-dot { margin: 0; }
+.qx-foot__cta { display: inline-flex; align-items: center; gap: 10px; padding: 12px 22px; margin-bottom: 20px; border-radius: 30px; background: var(--accent-cyan); color: var(--bg-main); font-weight: 700; font-size: 14px; text-decoration: none; box-shadow: 0 0 20px rgba(0, 229, 255, 0.25); transition: transform .3s, box-shadow .3s; }
+.qx-foot__cta:hover { transform: translateY(-3px); box-shadow: 0 0 30px rgba(0, 229, 255, 0.5); }
+.qx-foot .footer-social { justify-content: flex-start; flex-wrap: nowrap; gap: 8px; }
+.qx-foot .footer-social-link { width: 38px; height: 38px; flex: none; }
+
+/* Крупная надпись: едва заметная заливка, под курсором — подсветка фирменным циановым. */
+.qx-foot__mark { --mx: 50%; --my: 60%; margin: 56px 0 8px; font-weight: 800; font-size: clamp(72px, 19vw, 260px); line-height: .9; letter-spacing: -0.06em; text-align: center; user-select: none; white-space: nowrap;
+    color: transparent;
+    background: radial-gradient(320px circle at var(--mx) var(--my), rgba(0, 229, 255, 0.5), rgba(0, 229, 255, 0) 70%), linear-gradient(180deg, rgba(243, 244, 246, 0.07), rgba(243, 244, 246, 0.015));
+    -webkit-background-clip: text; background-clip: text; }
+[data-theme="light"] .qx-foot__mark { background-image: radial-gradient(320px circle at var(--mx) var(--my), rgba(2, 132, 199, 0.45), rgba(2, 132, 199, 0) 70%), linear-gradient(180deg, rgba(15, 23, 42, 0.07), rgba(15, 23, 42, 0.015)); }
+/* На телефоне курсора нет — подсветка медленно проходит по надписи сама. */
+@property --mx { syntax: '<length-percentage>'; inherits: false; initial-value: 50%; }
+@keyframes qx-mark-sweep { from { --mx: -10%; } to { --mx: 110%; } }
+@media (hover: none) and (prefers-reduced-motion: no-preference) { .qx-foot__mark { animation: qx-mark-sweep 7s ease-in-out infinite alternate; } }
+
+.qx-foot__bottom { display: flex; align-items: center; justify-content: space-between; gap: 16px 24px; flex-wrap: wrap; padding-top: 22px; border-top: 1px solid var(--border); }
+.qx-foot__bottom .footer-copy { font-size: 13px; }
+.qx-foot nav.qx-foot__langs { display: flex; gap: 4px; }
+.qx-foot__langs a { font-family: 'Fira Code', monospace; font-size: 12px; letter-spacing: 1px; padding: 6px 10px; border-radius: 20px; color: var(--text-muted); text-decoration: none; border: 1px solid transparent; transition: .25s; }
+.qx-foot__langs a:hover { color: var(--accent-cyan); }
+.qx-foot__langs a[aria-current="true"] { color: var(--accent-cyan); border-color: var(--accent-cyan); }
+.qx-foot__up { display: inline-flex; align-items: center; gap: 8px; color: var(--text-muted); font-size: 13px; font-weight: 600; text-decoration: none; transition: color .25s; }
+.qx-foot__up:hover { color: var(--accent-cyan); }
+.qx-foot__up svg { transition: transform .3s; }
+.qx-foot__up:hover svg { transform: translateY(-3px); }
+
+@media (max-width: 960px) {
+    .qx-foot__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .qx-foot__brand { grid-column: 1 / -1; }
+}
+@media (max-width: 560px) {
+    footer.qx-foot { padding: 52px 0 24px; }
+    .qx-foot__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px 20px; }
+    .qx-foot__grid > .qx-foot__col:last-child { grid-column: 1 / -1; }
+    .qx-foot__mark { margin-top: 40px; background-image: radial-gradient(150px circle at var(--mx) var(--my), rgba(0, 229, 255, 0.4), rgba(0, 229, 255, 0) 70%), linear-gradient(180deg, rgba(243, 244, 246, 0.07), rgba(243, 244, 246, 0.015)); }
+    [data-theme="light"] .qx-foot__mark { background-image: radial-gradient(150px circle at var(--mx) var(--my), rgba(2, 132, 199, 0.35), rgba(2, 132, 199, 0) 70%), linear-gradient(180deg, rgba(15, 23, 42, 0.07), rgba(15, 23, 42, 0.015)); }
+    .qx-foot__bottom { flex-direction: column; align-items: flex-start; }
+}
+
+/* Закрытое боковое меню: без тени у края экрана и вне порядка Tab. */
+.side-panel:not(.open) { box-shadow: none; visibility: hidden; transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.4s, box-shadow 0.4s, visibility 0s linear 0.4s; }

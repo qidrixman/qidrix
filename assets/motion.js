@@ -152,6 +152,15 @@
                     el.style.setProperty('--my', (e.clientY - r.top) + 'px');
                 });
             });
+            // Крупная надпись в футере подсвечивается там, где курсор.
+            document.querySelectorAll('.qx-foot__mark').forEach(function (el) {
+                var foot = el.closest('footer') || el;
+                foot.addEventListener('pointermove', function (e) {
+                    var r = el.getBoundingClientRect();
+                    el.style.setProperty('--mx', (e.clientX - r.left) + 'px');
+                    el.style.setProperty('--my', (e.clientY - r.top) + 'px');
+                });
+            });
         }
     });
 })();

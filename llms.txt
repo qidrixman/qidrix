@@ -1,0 +1,28 @@
+# Qidrix
+
+> Industrial innovation integrator: industrial radio networks, SCADA, telemetry, open-pit mine dispatching and AI analytics for mining, energy and agriculture.
+
+Qidrix designs and delivers turnkey industrial digitalization projects in Kazakhstan and Uzbekistan:
+from radio links, base stations and onboard hardware to SCADA, telemetry, dispatching software and AI analytics.
+Languages: Russian (default), English, Kazakh, Uzbek.
+
+## Case studies
+
+- [Digital Mine: Mining Fleet Digitization — Case Study](https://qidrix.asia/en/digimine/): Qidrix case study: open-pit radio network and repeaters, fail-safe power cabinets, onboard computers and V2X antennas on haul trucks, telemetry and mining fleet dispatching.
+- [6/10 kV SCADA for the Karaganda Power Grid — Case](https://qidrix.asia/en/astra/): How Qidrix and Astrawireless built a wireless SCADA and telemetry network for Karaganda Zharyk: 30 base stations, 1,847 subscriber stations, 15 grid districts. Interactive 3D fly-over.
+- [Digital Farming: Fleet Telemetry & Fuel Control — Case](https://qidrix.asia/en/agro/): Qidrix case study: field connectivity, tractor and combine telemetry, automated fuel accounting, video monitoring and drones for an agricultural enterprise. Turnkey delivery.
+
+## Pages
+
+- [Home (EN)](https://qidrix.asia/en/): solutions, approach, technologies, licensing and contacts
+- [Главная (RU)](https://qidrix.asia/)
+- [Басты бет (KK)](https://qidrix.asia/kk/)
+- [Bosh sahifa (UZ)](https://qidrix.asia/uz/)
+- [Demo open-pit mine dispatching system](https://qidrixman.github.io/qidrix-karier/demo/): interactive 3D demo (desktop browser)
+
+## Contact
+
+- Email: timur.salikhov@avatech.kz
+- Phone: +7 777 256 53 89
+- Telegram: https://t.me/timuverse
+- LinkedIn: https://www.linkedin.com/in/timursalikhov

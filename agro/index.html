@@ -1,28 +1,43 @@
 <!DOCTYPE html>
-<html lang="ru" data-theme="dark">
+<html data-page="agro/" data-root="../" lang="ru" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Кейс Qidrix: цифровизация агропредприятия — каналы связи, телеметрия техники, учет ГСМ и видеоаналитика.">
-    <link rel="canonical" href="https://qidrix.asia/agro/">
+    <meta content="Кейс Qidrix: связь на полях, мониторинг тракторов и комбайнов, автоматизация учёта ГСМ, видеоконтроль и БПЛА для агропредприятия. Решение под ключ." name="description">
+    <meta content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" name="robots">
+    <link href="https://qidrix.asia/agro/" rel="canonical">
+    <link href="https://qidrix.asia/agro/" hreflang="ru" rel="alternate">
+    <link href="https://qidrix.asia/en/agro/" hreflang="en" rel="alternate">
+    <link href="https://qidrix.asia/kk/agro/" hreflang="kk" rel="alternate">
+    <link href="https://qidrix.asia/uz/agro/" hreflang="uz" rel="alternate">
+    <link href="https://qidrix.asia/agro/" hreflang="x-default" rel="alternate">
+    <meta content="article" property="og:type">
+    <meta content="Qidrix" property="og:site_name">
+    <meta content="ru_RU" property="og:locale">
+    <meta content="en_US" property="og:locale:alternate">
+    <meta content="kk_KZ" property="og:locale:alternate">
+    <meta content="uz_UZ" property="og:locale:alternate">
+    <meta content="Цифровое агро: телеметрия техники и учёт ГСМ — кейс | Qidrix" property="og:title">
+    <meta content="Кейс Qidrix: связь на полях, мониторинг тракторов и комбайнов, автоматизация учёта ГСМ, видеоконтроль и БПЛА для агропредприятия. Решение под ключ." property="og:description">
+    <meta content="https://qidrix.asia/agro/" property="og:url">
+    <meta content="https://qidrix.asia/assets/img/og.jpg" property="og:image">
+    <meta content="1200" property="og:image:width">
+    <meta content="630" property="og:image:height">
+    <meta content="Цифровое агро: телеметрия техники и учёт ГСМ — кейс | Qidrix" property="og:image:alt">
+    <meta content="summary_large_image" name="twitter:card">
+    <meta content="Цифровое агро: телеметрия техники и учёт ГСМ — кейс | Qidrix" name="twitter:title">
+    <meta content="Кейс Qidrix: связь на полях, мониторинг тракторов и комбайнов, автоматизация учёта ГСМ, видеоконтроль и БПЛА для агропредприятия. Решение под ключ." name="twitter:description">
+    <meta content="https://qidrix.asia/assets/img/og.jpg" name="twitter:image">
+    <link type="image/svg+xml" href="../favicon.svg" rel="icon">
+    <link sizes="96x96" type="image/png" href="../assets/img/icon-96.png" rel="icon">
+    <link href="../assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="../site.webmanifest" rel="manifest">
     <meta name="color-scheme" content="dark light">
     <meta name="referrer" content="strict-origin-when-cross-origin">
-    <meta property="og:type" content="website">
-    <meta property="og:site_name" content="Qidrix">
-    <meta property="og:locale" content="ru_RU">
-    <meta property="og:title" content="Цифровизация агропредприятия — кейс Qidrix">
-    <meta property="og:description" content="Кейс Qidrix: цифровизация агропредприятия — каналы связи, телеметрия техники, учет ГСМ и видеоаналитика.">
-    <meta property="og:url" content="https://qidrix.asia/agro/">
-    <meta property="og:image" content="https://qidrix.asia/assets/img/og.jpg">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
-    <meta name="twitter:card" content="summary_large_image">
     <meta name="theme-color" content="#121417">
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23121417'/%3E%3Cpath d='M22 22H70V56H56V36H36V56H56V70H22Z' fill='%23F3F4F6'/%3E%3Crect x='56' y='56' width='22' height='22' fill='%2300E5FF'/%3E%3C/svg%3E">
-    <title>Qidrix | Цифровизация в сельском хозяйстве</title>
-    <link rel="preload" href="../assets/fonts/Inter-400-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
+    <title>Цифровое агро: телеметрия техники и учёт ГСМ — кейс | Qidrix</title>
+    <link rel="preload" href="../assets/fonts/Inter-400-cyrillic.woff2" as="font" type="font/woff2" crossorigin="">
     <link rel="stylesheet" href="../assets/fonts/fonts.css">
-    
     <script>
         if ('scrollRestoration' in history) {
             history.scrollRestoration = 'manual';
@@ -33,12 +48,20 @@
             window.history.replaceState(null, null, window.location.pathname);
         }
         window.scrollTo(0, 0);
+        // Посетитель раньше выбрал другой язык и пришёл извне — сразу открываем его версию страницы.
+        // Поисковые роботы ничего не хранят, поэтому всегда видят страницу по её адресу.
+        try {
+            var qxSaved = localStorage.getItem('qidrix_lang'), qxHtml = document.documentElement;
+            var qxExternal = !document.referrer || new URL(document.referrer).origin !== location.origin;
+            if (qxHtml.lang === 'ru' && qxExternal && /^(en|kk|uz)$/.test(qxSaved || '') && qxHtml.dataset.root !== undefined) {
+                location.replace(qxHtml.dataset.root + qxSaved + '/' + qxHtml.dataset.page + (window.qxHashTarget || ''));
+            }
+        } catch (e) {}
         // Тему применяем до отрисовки, чтобы не было вспышки светлой темы
         try {
             document.documentElement.setAttribute('data-theme', localStorage.getItem('qidrix_theme') || (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'));
         } catch (e) {}
     </script>
-
     <style>
         /* === ТЕМНЫЕ И СВЕТЛЫЕ ПЕРЕМЕННЫЕ === */
         :root, [data-theme="dark"] {
@@ -54,7 +77,6 @@
             --grid-line: rgba(0, 229, 255, 0.05);
             --shadow: 0 20px 40px rgba(0,0,0,0.5);
         }
-
         [data-theme="light"] {
             --bg-main: #F8FAFC;
             --bg-panel: #FFFFFF;
@@ -68,10 +90,8 @@
             --grid-line: rgba(2, 132, 199, 0.05);
             --shadow: 0 4px 15px rgba(15, 23, 42, 0.05);
         }
-
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html { scroll-behavior: smooth; scroll-padding-top: 80px; } 
-        
         body {
             font-family: 'Inter', sans-serif;
             background-color: var(--bg-main);
@@ -79,7 +99,6 @@
             transition: background-color 0.4s ease, color 0.4s ease;
             overflow-x: hidden;
         }
-
         .grid-bg {
             position: fixed;
             top: 0; left: 0; width: 100vw; height: 100vh;
@@ -90,25 +109,19 @@
             z-index: -1;
             transition: background-image 0.4s ease;
         }
-
         /* === НАВИГАЦИЯ (HEADER) === */
         header { 
             background-color: var(--bg-header); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
             position: fixed; width: 100%; top: 0; z-index: 1000; border-bottom: 1px solid var(--border); 
             transition: 0.4s ease; 
         }
-        
         .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; width: 100%; }
         nav { display: flex; justify-content: space-between; align-items: center; height: 80px; }
-        
         .logo { display: flex; align-items: center; gap: 15px; text-decoration: none; cursor: pointer; }
         .logo-svg { width: 36px; height: 36px; }
         .logo-text { font-size: 26px; font-weight: 800; color: var(--text-main); letter-spacing: -1px; transition: 0.4s; }
         .logo-text span { color: var(--accent-cyan); }
-        
-        
         .nav-right { display: flex; align-items: center; gap: 12px; }
-
         .icon-btn { 
             background: var(--bg-panel); border: 1px solid var(--border); color: var(--text-main); 
             cursor: pointer; display: flex; align-items: center; justify-content: center; 
@@ -117,7 +130,6 @@
         .theme-toggle-btn { width: 42px; height: 42px; }
         .theme-toggle-btn:hover { border-color: var(--accent-cyan); color: var(--accent-cyan); transform: rotate(15deg); }
         .theme-toggle-btn svg { width: 18px; height: 18px; }
-
         .lang-dropdown { position: relative; display: inline-block; }
         .lang-menu-btn { 
             background: var(--bg-panel); border: 1px solid var(--border); color: var(--text-main); 
@@ -126,7 +138,6 @@
         }
         .lang-menu-btn:hover, .lang-dropdown.active .lang-menu-btn { border-color: var(--accent-cyan); color: var(--accent-cyan); }
         .lang-menu-btn svg { width: 18px; height: 18px; }
-        
         .lang-dropdown-content { 
             position: absolute; top: 100%; right: 0; margin-top: 10px; background: var(--bg-panel); 
             border: 1px solid var(--border); border-radius: 12px; padding: 8px; display: flex; 
@@ -140,9 +151,7 @@
             transition: 0.2s; display: flex; align-items: center; gap: 8px; white-space: nowrap; 
         }
         .lang-dropdown-btn:hover, .lang-dropdown-btn.active { background: var(--border); color: var(--accent-cyan); }
-
         .burger-btn { background: none; border: none; color: var(--text-main); cursor: pointer; display: none; align-items: center; padding: 4px; transition: 0.3s; }
-        
         /* Мобильное меню */
         .panel-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background: var(--bg-overlay); backdrop-filter: blur(4px); z-index: 1999; opacity: 0; visibility: hidden; transition: 0.4s; pointer-events: none;}
         .panel-overlay.open { opacity: 1; visibility: visible; pointer-events: auto;}
@@ -153,7 +162,6 @@
         .mobile-nav-links { display: flex; flex-direction: column; gap: 24px; list-style: none; }
         .mobile-nav-links a { color: var(--text-main); text-decoration: none; font-size: 18px; font-weight: 600; transition: 0.3s; display: block; }
         .mobile-nav-links a:hover { color: var(--accent-cyan); }
-
         /* === ОСНОВНОЙ КОНТЕНТ === */
         section {
             display: flex;
@@ -163,7 +171,6 @@
             border-bottom: 1px solid var(--border);
             position: relative;
         }
-
         #case-hero {
             position: relative;
             padding: 0;
@@ -175,7 +182,6 @@
             overflow: hidden;
             border-bottom: 1px solid var(--border);
         }
-
         .hero-bg-video {
             position: absolute;
             top: 0;
@@ -185,7 +191,6 @@
             object-fit: cover;
             z-index: 1;
         }
-
         .hero-overlay {
             position: absolute;
             top: 0;
@@ -196,11 +201,9 @@
             z-index: 2;
             transition: background 0.4s ease;
         }
-
         [data-theme="light"] .hero-overlay {
             background: linear-gradient(180deg, rgba(248, 250, 252, 0.8) 0%, rgba(248, 250, 252, 0.95) 100%);
         }
-
         .hero-content-overlay {
             position: relative;
             z-index: 3;
@@ -209,21 +212,18 @@
             padding: 0 20px;
             margin-top: 40px;
         }
-
         .hero-content-overlay h1 {
             font-size: 64px;
             letter-spacing: -2px;
             margin-bottom: 24px;
             line-height: 1.05;
         }
-
         .hero-content-overlay p {
             font-size: 20px;
             margin: 0 auto 30px auto;
             color: var(--text-muted);
             max-width: 750px;
         }
-
         .hero-bounce-btn {
             display: inline-flex;
             align-items: center;
@@ -240,7 +240,6 @@
             transition: 0.3s ease;
             animation: bounce-subtle 2s infinite ease-in-out;
         }
-
         .hero-bounce-btn:hover {
             background: var(--accent-cyan);
             color: var(--bg-main);
@@ -248,18 +247,15 @@
             transform: translateY(-3px);
             animation: none;
         }
-
         @keyframes bounce-subtle {
             0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
             40% { transform: translateY(-8px); }
             60% { transform: translateY(-4px); }
         }
-
         h1 { font-size: 52px; font-weight: 800; letter-spacing: -2px; margin-top: 0; margin-bottom: 16px; line-height: 1.1; transition: color 0.4s; }
         h1 span { color: var(--accent-cyan); }
         h2 { font-size: 38px; font-weight: 800; margin-top: 0; margin-bottom: 14px; color: var(--text-main); letter-spacing: -1px; transition: color 0.4s;}
         p { font-size: 16px; color: var(--text-muted); line-height: 1.5; transition: color 0.4s;}
-        
         .mono {
             font-family: 'Fira Code', monospace;
             color: var(--accent-cyan);
@@ -271,7 +267,6 @@
             display: block;
             line-height: 1;
         }
-
         /* === СЕТКА ПО СКРИНУ: ФОТО СЛЕВА, ТЕКСТ СПРАВА И БЛОКИ ПОД НИМ === */
         .step-layout {
             display: grid;
@@ -283,14 +278,12 @@
             margin: 0 auto;
             align-items: stretch;
         }
-
         /* Левая ячейка: фото растягивается на обе строки правой колонки */
         .step-left-cell {
             grid-column: 1;
             grid-row: 1 / span 2;
             display: flex;
         }
-
         .image-wrapper {
             position: relative; 
             border-radius: 16px; 
@@ -303,7 +296,6 @@
             min-height: 400px;
             display: flex; 
         }
-
         .image-wrapper img {
             width: 100%; 
             height: 100%; 
@@ -312,17 +304,14 @@
             animation: breathe-pan 20s infinite alternate ease-in-out;
             transition: filter 0.5s ease;
         }
-
         @keyframes breathe-pan { 
             0% { transform: scale(1); } 
             100% { transform: scale(1.05); } 
         }
-
         .image-wrapper:hover img { 
             animation-play-state: paused; 
             filter: brightness(1.1); 
         }
-
         /* Правая ячейка: основной текст */
         .step-right-cell {
             grid-column: 2;
@@ -333,7 +322,6 @@
             background: transparent;
             padding: 0 0 24px 0;
         }
-
         /* Блоки выстраиваются вертикально в правой колонке */
         .step-bottom-row {
             grid-column: 2;
@@ -343,7 +331,6 @@
             gap: 16px;
             width: 100%;
         }
-
         .feature-item {
             display: flex;
             align-items: flex-start;
@@ -356,12 +343,9 @@
             transition: background-color 0.4s, border-color 0.4s;
             height: 100%;
         }
-        
         .feature-item.cyan { border-left: 3px solid var(--accent-cyan); }
-
         .feature-item div { font-size: 16px; color: var(--text-main); font-weight: 600; }
         .feature-item span { display: block; font-size: 14px; color: var(--text-muted); margin-top: 6px; font-weight: 400; line-height: 1.5; }
-
         /* === АНИМАЦИИ-ЗАПОЛНИТЕЛИ === */
         .tech-animation-container {
             display: flex;
@@ -370,7 +354,6 @@
             margin-top: 15px;
             opacity: 0.7;
         }
-
         .anim-waves { width: 50px; height: 50px; position: relative; }
         .anim-waves::before, .anim-waves::after, .anim-waves span {
             content: ''; position: absolute; border: 2px solid var(--accent-cyan);
@@ -380,7 +363,6 @@
         .anim-waves::after { animation-delay: 1.5s; }
         .anim-waves span { animation-delay: 3s; }
         @keyframes pulse-wave { 0% { width: 0; height: 0; opacity: 1; } 100% { width: 100%; height: 100%; opacity: 0; } }
-
         .anim-radar {
             width: 50px; height: 50px; border-radius: 50%;
             border: 2px solid rgba(0, 229, 255, 0.2); position: relative; overflow: hidden;
@@ -390,7 +372,6 @@
             background: conic-gradient(from 0deg, transparent 70%, var(--accent-cyan) 100%);
             transform-origin: 0 0; animation: spin 4s linear infinite;
         }
-
         .anim-sync {
             width: 45px; height: 45px; border: 3px dashed var(--accent-amber);
             border-radius: 50%; animation: spin 12s linear infinite; position: relative;
@@ -400,7 +381,6 @@
             background: rgba(255, 184, 0, 0.2); transform: translate(-50%, -50%);
             animation: pulse-glow 3s ease-in-out infinite alternate;
         }
-
         .anim-scan {
             width: 70px; height: 45px; border: 2px solid rgba(0, 229, 255, 0.2);
             border-radius: 6px; position: relative; overflow: hidden;
@@ -410,11 +390,9 @@
             background: var(--accent-cyan); box-shadow: 0 0 10px 2px var(--accent-cyan);
             animation: scan-line 3s ease-in-out infinite alternate;
         }
-
         @keyframes spin { 100% { transform: rotate(360deg); } }
         @keyframes pulse-glow { 100% { transform: translate(-50%, -50%) scale(1.5); opacity: 0.5; } }
         @keyframes scan-line { 0% { top: 0; } 100% { top: 100%; } }
-
         /* === ФУТЕР === */
         footer {
             padding: 60px 20px;
@@ -423,14 +401,12 @@
             background: var(--bg-main);
             position: relative;
         }
-
         .footer-content {
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 16px;
         }
-
         /* АДАПТИВНОСТЬ */
         @media (max-width: 968px) {
             .step-layout { grid-template-columns: 1fr; grid-template-rows: auto; gap: 32px; }
@@ -447,11 +423,9 @@
         /* === ОБЩИЕ ЭЛЕМЕНТЫ САЙТА (единые для всех страниц) === */
         .svg-fill-main { fill: var(--text-main); transition: 0.4s; }
         .svg-fill-cyan { fill: var(--accent-cyan); transition: 0.4s; }
-
         .nav-links { display: flex; gap: 28px; list-style: none; }
         .nav-links a { color: var(--text-muted); text-decoration: none; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s; }
         .nav-links a:hover { color: var(--accent-cyan); }
-
         /* Кнопка входа в демо-карьер */
         .demo-btn {
             display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px;
@@ -466,7 +440,6 @@
         @keyframes demo-dot-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
         .mobile-nav-links .demo-btn { display: inline-flex; color: var(--bg-main); font-size: 16px; }
         .mobile-nav-links .demo-btn:hover { color: var(--bg-main); }
-
         /* Главный экран — как на стартовой */
         #case-hero {
             position: relative; padding: 0; height: 100vh; min-height: 550px;
@@ -501,12 +474,10 @@
             40% { transform: translateY(-8px); }
             60% { transform: translateY(-4px); }
         }
-
         /* Боковые точки навигации */
         .nav-dots { position: fixed; right: 30px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 15px; z-index: 10; }
         .nav-dots a { width: 10px; height: 10px; border-radius: 50%; background: var(--text-muted); opacity: 0.3; transition: 0.3s; }
         .nav-dots a:hover { opacity: 1; background: var(--accent-cyan); box-shadow: 0 0 10px var(--accent-cyan); }
-
         /* Футер */
         footer { padding: 60px 20px; text-align: center; border-top: 1px solid var(--border); background: var(--bg-main); position: relative; transition: background-color 0.4s ease; }
         .footer-content { display: flex; flex-direction: column; align-items: center; gap: 20px; }
@@ -518,7 +489,6 @@
         }
         .footer-btn:hover { border-color: var(--accent-cyan); color: var(--accent-cyan); }
         .footer-copy { font-size: 14px; color: var(--text-muted); }
-
         @media (max-width: 1100px) {
             .nav-links { display: none; }
             .burger-btn { display: flex; }
@@ -587,6 +557,7 @@
         a:focus-visible, button:focus-visible, select:focus-visible { outline: 2px solid var(--accent-cyan); outline-offset: 3px; }
     </style>
     <link rel="stylesheet" href="../assets/motion.css">
+    <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://qidrix.asia/#org","name":"Qidrix","url":"https://qidrix.asia/","logo":{"@type":"ImageObject","url":"https://qidrix.asia/assets/img/icon-512.png","width":512,"height":512},"image":"https://qidrix.asia/assets/img/og.jpg","description":"Интегратор промышленных инноваций: промышленные радиосети, SCADA, телеметрия, диспетчеризация карьеров и ИИ-аналитика для горной добычи, энергетики и сельского хозяйства.","areaServed":[{"@type":"Country","name":"Kazakhstan"},{"@type":"Country","name":"Uzbekistan"}],"knowsAbout":["SCADA","Industrial wireless networks","Telemetry","Fleet management system","Open-pit mine dispatching","Fuel monitoring","Industrial IoT","AI video analytics"],"contactPoint":[{"@type":"ContactPoint","contactType":"sales","telephone":"+7-777-256-53-89","email":"timur.salikhov@avatech.kz","areaServed":["KZ","UZ"],"availableLanguage":["ru","en","kk","uz"]}],"sameAs":["https://www.linkedin.com/in/timursalikhov","https://t.me/timuverse"]},{"@type":"WebSite","@id":"https://qidrix.asia/#website","name":"Qidrix","url":"https://qidrix.asia/","inLanguage":["ru","en","kk","uz"],"publisher":{"@id":"https://qidrix.asia/#org"}},{"@type":"WebPage","@id":"https://qidrix.asia/agro/#webpage","url":"https://qidrix.asia/agro/","name":"Цифровое агро: телеметрия техники и учёт ГСМ — кейс | Qidrix","description":"Кейс Qidrix: связь на полях, мониторинг тракторов и комбайнов, автоматизация учёта ГСМ, видеоконтроль и БПЛА для агропредприятия. Решение под ключ.","inLanguage":"ru","isPartOf":{"@id":"https://qidrix.asia/#website"},"about":{"@id":"https://qidrix.asia/#org"},"primaryImageOfPage":"https://qidrix.asia/assets/img/og.jpg","breadcrumb":{"@id":"https://qidrix.asia/agro/#breadcrumbs"}},{"@type":"BreadcrumbList","@id":"https://qidrix.asia/agro/#breadcrumbs","itemListElement":[{"@type":"ListItem","position":1,"name":"Главная","item":"https://qidrix.asia/"},{"@type":"ListItem","position":2,"name":"Цифровизация сельского хозяйства","item":"https://qidrix.asia/agro/"}]},{"@type":"Service","@id":"https://qidrix.asia/agro/#service","name":"Цифровизация сельского хозяйства","serviceType":"Agriculture digitalization","description":"Кейс Qidrix: связь на полях, мониторинг тракторов и комбайнов, автоматизация учёта ГСМ, видеоконтроль и БПЛА для агропредприятия. Решение под ключ.","provider":{"@id":"https://qidrix.asia/#org"},"areaServed":[{"@type":"Country","name":"Kazakhstan"},{"@type":"Country","name":"Uzbekistan"}],"url":"https://qidrix.asia/agro/"}]}</script>
 </head>
 <body>
     <a class="skip-link" href="#content" data-ru="Перейти к содержимому" data-en="Skip to content" data-kk="Мазмұнға өту" data-uz="Asosiy qismga oʻtish">Перейти к содержимому</a>
@@ -622,16 +593,16 @@
 
                     <button class="theme-toggle-btn icon-btn" onclick="toggleTheme()" aria-label="Сменить тему" data-aria-ru="Сменить тему" data-aria-en="Toggle theme" data-aria-kk="Тақырыпты ауыстыру" data-aria-uz="Mavzuni almashtirish" id="themeBtn">
                         <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
                         </svg>
                     </button>
 
                     <div class="lang-dropdown" id="langDropdown">
                         <button class="lang-menu-btn" onclick="toggleDropdown(event)" aria-label="Выбрать язык" data-aria-ru="Выбрать язык" data-aria-en="Choose language" data-aria-kk="Тілді таңдау" data-aria-uz="Tilni tanlash" aria-haspopup="true">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <circle cx="12" cy="12" r="10"></circle>
-                                <line x1="2" y1="12" x2="22" y2="12"></line>
-                                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1 4-10z"></path>
+                                <circle cx="12" cy="12" r="10" />
+                                <line x1="2" y1="12" x2="22" y2="12" />
+                                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1 4-10z" />
                             </svg>
                             <span id="currentLangDisplay">RU</span>
                         </button>
@@ -645,9 +616,9 @@
 
                     <button class="burger-btn" onclick="toggleMenu()" aria-label="Меню" data-aria-ru="Меню" data-aria-en="Menu" data-aria-kk="Мәзір" data-aria-uz="Menyu" aria-controls="sidePanel">
                         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <line x1="3" y1="12" x2="21" y2="12"></line>
-                            <line x1="3" y1="6" x2="21" y2="6"></line>
-                            <line x1="3" y1="18" x2="21" y2="18"></line>
+                            <line x1="3" y1="12" x2="21" y2="12" />
+                            <line x1="3" y1="6" x2="21" y2="6" />
+                            <line x1="3" y1="18" x2="21" y2="18" />
                         </svg>
                     </button>
                 </div>
@@ -659,8 +630,8 @@
     <div class="side-panel" id="sidePanel">
         <button class="close-btn" onclick="toggleMenu()" aria-label="Закрыть меню" data-aria-ru="Закрыть меню" data-aria-en="Close menu" data-aria-kk="Мәзірді жабу" data-aria-uz="Menyuni yopish">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="18" y1="6" x2="6" y2="18"></line>
-                <line x1="6" y1="6" x2="18" y2="18"></line>
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
             </svg>
         </button>
         <div class="panel-content">
@@ -688,7 +659,7 @@
     <main id="content" tabindex="-1">
     <!-- КЕЙС: Главный экран -->
     <section id="case-hero">
-        <video autoplay loop muted playsinline disablepictureinpicture preload="auto" poster="video-poster.webp" aria-hidden="true" class="hero-bg-video" oncanplay="this.playbackRate=0.75">
+        <video autoplay loop muted playsinline disablepictureinpicture="" preload="auto" poster="video-poster.webp" aria-hidden="true" class="hero-bg-video" oncanplay="this.playbackRate=0.75">
             <source src="video.mp4" type="video/mp4">
         </video>
         
@@ -702,7 +673,7 @@
             
             <a href="#step-1" class="hero-bounce-btn">
                 <span data-ru="Решения" data-en="Solutions" data-kk="Шешімдер" data-uz="Yechimlar">Решения</span>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M19 12l-7 7-7-7" /></svg>
             </a>
         </div>
     </section>
@@ -849,23 +820,43 @@
 
     </main>
 
-    <footer>
-        <div class="container footer-content">
-            <div class="footer-actions">
-                <a href="../#slide-2" class="footer-btn"><span data-ru="← Все решения" data-en="← All solutions" data-kk="← Барлық шешімдер" data-uz="← Barcha yechimlar">← Все решения</span></a>
-                <a href="#case-hero" class="hero-bounce-btn">
-                    <span data-ru="Наверх" data-en="To Top" data-kk="Жоғары" data-uz="Yuqoriga">Наверх</span>
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
-                </a>
+    <footer class="qx-foot">
+        <div class="container">
+            <div class="qx-foot__grid">
+                <div class="qx-foot__brand">
+                    <a href="../" class="logo" aria-label="Qidrix">
+                        <svg class="logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M 10 10 H 80 V 60 H 60 V 30 H 30 V 60 H 60 V 80 H 10 Z" class="svg-fill-main" /><rect x="60" y="60" width="30" height="30" class="svg-fill-cyan" /></svg>
+                        <div class="logo-text">Qidri<span>x</span></div>
+                    </a>
+                    <p class="qx-foot__about" data-ru="Интегратор промышленных инноваций: связь, SCADA, телеметрия и ИИ-аналитика для горной добычи, энергетики и агро — от железа до экономики." data-en="Industrial innovation integrator: connectivity, SCADA, telemetry and AI analytics for mining, energy and agriculture — from hardware to economics." data-kk="Өнеркәсіптік инновациялар интеграторы: тау-кен, энергетика және агро үшін байланыс, SCADA, телеметрия және ЖИ-аналитика — жабдықтан экономикаға дейін." data-uz="Sanoat innovatsiyalari integratori: tog‘-kon, energetika va agro uchun aloqa, SCADA, telemetriya va sun’iy intellekt tahlili — uskunadan iqtisodiyotgacha.">Интегратор промышленных инноваций: связь, SCADA, телеметрия и ИИ-аналитика для горной добычи, энергетики и агро — от железа до экономики.</p>
+                    <span class="mono qx-foot__geo" data-ru="Казахстан · Узбекистан" data-en="Kazakhstan · Uzbekistan" data-kk="Қазақстан · Өзбекстан" data-uz="Qozog‘iston · O‘zbekiston">Казахстан · Узбекистан</span>
+                </div>
+                <nav class="qx-foot__col" aria-label="Решения" data-aria-ru="Решения" data-aria-en="Solutions" data-aria-kk="Шешімдер" data-aria-uz="Yechimlar">
+                    <p class="qx-foot__h" data-ru="Решения" data-en="Solutions" data-kk="Шешімдер" data-uz="Yechimlar">Решения</p>
+                    <ul><li><a href="../digimine/" data-ru="Горная добыча" data-en="Mining" data-kk="Тау-кен өндірісі" data-uz="Tog‘-kon qazib olish">Горная добыча</a></li><li><a href="../astra/" data-ru="SCADA для электросетей" data-en="SCADA for power grids" data-kk="Электр желілеріне SCADA" data-uz="Elektr tarmoqlari uchun SCADA">SCADA для электросетей</a></li><li><a href="../agro/" aria-current="page" data-ru="Сельское хозяйство" data-en="Agriculture" data-kk="Ауыл шаруашылығы" data-uz="Qishloq xo‘jaligi">Сельское хозяйство</a></li><li><a href="https://qidrixman.github.io/qidrix-karier/demo/" class="qx-foot__demo"><span class="demo-dot"></span><span data-ru="Демо-карьер" data-en="Demo mine" data-kk="Демо-карьер" data-uz="Demo karyer">Демо-карьер</span></a></li></ul>
+                </nav>
+                <nav class="qx-foot__col" aria-label="Компания" data-aria-ru="Компания" data-aria-en="Company" data-aria-kk="Компания" data-aria-uz="Kompaniya">
+                    <p class="qx-foot__h" data-ru="Компания" data-en="Company" data-kk="Компания" data-uz="Kompaniya">Компания</p>
+                    <ul><li><a href="../#slide-2" data-ru="Все решения" data-en="All solutions" data-kk="Барлық шешімдер" data-uz="Barcha yechimlar">Все решения</a></li><li><a href="../#slide-3" data-ru="Подход" data-en="Approach" data-kk="Тәсіл" data-uz="Yondashuv">Подход</a></li><li><a href="../#slide-4" data-ru="Технологии" data-en="Technologies" data-kk="Технологиялар" data-uz="Texnologiyalar">Технологии</a></li><li><a href="../#slide-5" data-ru="Экономика" data-en="Economics" data-kk="Экономика" data-uz="Iqtisodiyot">Экономика</a></li></ul>
+                </nav>
+                <div class="qx-foot__col">
+                    <p class="qx-foot__h" data-ru="Связаться" data-en="Get in touch" data-kk="Байланысу" data-uz="Bog‘lanish">Связаться</p>
+                    <a href="../#slide-6" class="qx-foot__cta"><span data-ru="Обсудить проект" data-en="Discuss a project" data-kk="Жобаны талқылау" data-uz="Loyihani muhokama qilish">Обсудить проект</span> <span aria-hidden="true">→</span></a>
+                    <div class="footer-social">
+        <a class="footer-social-link" href="https://t.me/timuverse" target="_blank" rel="noopener" title="Telegram" aria-label="Telegram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2L11 13" /><path d="M22 2l-7 20-4-9-9-4 20-7z" /></svg></a>
+        <a class="footer-social-link" href="https://www.linkedin.com/in/timursalikhov" target="_blank" rel="noopener" title="LinkedIn" aria-label="LinkedIn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z" /><rect x="2" y="9" width="4" height="12" /><circle cx="4" cy="4" r="2" /></svg></a>
+        <a class="footer-social-link" href="mailto:timur.salikhov@avatech.kz" title="Email" aria-label="Email"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" /><polyline points="22,6 12,13 2,6" /></svg></a>
+        <a class="footer-social-link" href="tel:+77772565389" title="Позвонить" aria-label="Позвонить" data-aria-ru="Позвонить" data-aria-en="Call" data-aria-kk="Қоңырау шалу" data-aria-uz="Qo‘ng‘iroq qilish"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z" /></svg></a>
+        <a class="footer-social-link" href="https://timsalikhov.link" target="_blank" rel="noopener" title="timsalikhov.link" aria-label="timsalikhov.link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10" /><line x1="2" y1="12" x2="22" y2="12" /><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" /></svg></a>
+                    </div>
+                </div>
             </div>
-            <div class="footer-social">
-        <a class="footer-social-link" href="https://t.me/timuverse" target="_blank" rel="noopener" title="Telegram" aria-label="Telegram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg></a>
-        <a class="footer-social-link" href="https://www.linkedin.com/in/timursalikhov" target="_blank" rel="noopener" title="LinkedIn" aria-label="LinkedIn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg></a>
-        <a class="footer-social-link" href="mailto:timur.salikhov@avatech.kz" title="Email" aria-label="Email"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></a>
-        <a class="footer-social-link" href="tel:+77772565389" title="Позвонить" aria-label="Позвонить"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg></a>
-        <a class="footer-social-link" href="https://timsalikhov.link" target="_blank" rel="noopener" title="timsalikhov.link" aria-label="timsalikhov.link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></a>
+            <div class="qx-foot__mark" aria-hidden="true">Qidri<span>x</span></div>
+            <div class="qx-foot__bottom">
+                <div class="footer-copy" data-ru="Qidrix © 2026. Все права защищены." data-en="Qidrix © 2026. All rights reserved." data-kk="Qidrix © 2026. Барлық құқықтар қорғалған." data-uz="Qidrix © 2026. Barcha huquqlar himoyalangan.">Qidrix © 2026. Все права защищены.</div>
+                <nav class="qx-foot__langs" data-qx-langs="" aria-label="Язык сайта" data-aria-ru="Язык сайта" data-aria-en="Site language" data-aria-kk="Сайт тілі" data-aria-uz="Sayt tili"><a aria-current="true" lang="ru" hreflang="ru" href="../agro/">RU</a><a lang="en" hreflang="en" href="../en/agro/">EN</a><a lang="kk" hreflang="kk" href="../kk/agro/">KZ</a><a lang="uz" hreflang="uz" href="../uz/agro/">UZ</a></nav>
+                <a href="#case-hero" class="qx-foot__up"><span data-ru="Наверх" data-en="To top" data-kk="Жоғары" data-uz="Yuqoriga">Наверх</span> <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7" /></svg></a>
             </div>
-            <div class="footer-copy" data-ru="Qidrix &copy; 2026. Все права защищены." data-en="Qidrix &copy; 2026. All rights reserved." data-kk="Qidrix &copy; 2026. Барлық құқықтар қорғалған." data-uz="Qidrix &copy; 2026. Barcha huquqlar himoyalangan.">Qidrix &copy; 2026. Все права защищены.</div>
         </div>
     </footer>
 
@@ -877,7 +868,15 @@
             document.getElementById('langContent').classList.toggle('show');
         }
 
+        // Язык этой страницы задан адресом: / — русский, /en/, /kk/, /uz/ — остальные.
+        const PAGE_LANG = document.documentElement.lang || 'ru';
+
         function setLang(lang) {
+            if (lang !== PAGE_LANG && window.qxLangUrl) {
+                try { localStorage.setItem('qidrix_lang', lang); } catch (e) {}
+                window.location.href = window.qxLangUrl(lang, true);
+                return;
+            }
             currentLang = lang;
             try { localStorage.setItem('qidrix_lang', lang); } catch (e) {}
             document.documentElement.lang = lang;
@@ -976,7 +975,7 @@
             const currentTheme = savedTheme ? savedTheme : (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
             document.documentElement.setAttribute('data-theme', currentTheme);
             updateThemeIcon(currentTheme);
-            setLang(savedLang ? savedLang : 'ru');
+            setLang(PAGE_LANG);
 
             if (window.qxHashTarget) {
                 const target = document.getElementById(window.qxHashTarget.slice(1));

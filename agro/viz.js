@@ -181,17 +181,150 @@
     return { x: last[0], y: last[1], dir: 0, seg: path.length - 2 };
   }
 
-  /** Машинка (трактор / комбайн) — короб с кабиной; переставляется через transform. */
+  // ─── Движение техники: сглаженный маршрут, скорость по кривизне, корпус по курсу ───
+
+  /** Ломаная со скруглёнными углами (дуги радиуса r), сэмплированная с шагом ~0.05. */
+  function smooth(points, r, closed) {
+    var pts0 = points.slice();
+    var out = [];
+    var n = pts0.length;
+    for (var i = 0; i < n; i++) {
+      var p = pts0[i];
+      var prev = pts0[(i - 1 + n) % n];
+      var next = pts0[(i + 1) % n];
+      var isEnd = !closed && (i === 0 || i === n - 1);
+      if (isEnd) { out.push(p); continue; }
+      var a = [prev[0] - p[0], prev[1] - p[1]];
+      var b = [next[0] - p[0], next[1] - p[1]];
+      var la = Math.hypot(a[0], a[1]);
+      var lb = Math.hypot(b[0], b[1]);
+      var rr = Math.min(r, la / 2, lb / 2);
+      var s0 = [p[0] + (a[0] / la) * rr, p[1] + (a[1] / la) * rr];
+      var s1 = [p[0] + (b[0] / lb) * rr, p[1] + (b[1] / lb) * rr];
+      for (var k = 0; k <= 8; k++) {
+        var t = k / 8;
+        var u = 1 - t;
+        out.push([u * u * s0[0] + 2 * u * t * p[0] + t * t * s1[0], u * u * s0[1] + 2 * u * t * p[1] + t * t * s1[1]]);
+      }
+    }
+    if (closed) out.push(out[0]);
+    // Равномерный шаг.
+    var dense = [out[0]];
+    for (var j = 1; j < out.length; j++) {
+      var q0 = out[j - 1];
+      var q1 = out[j];
+      var d = Math.hypot(q1[0] - q0[0], q1[1] - q0[1]);
+      var steps = Math.max(1, Math.ceil(d / 0.05));
+      for (var m = 1; m <= steps; m++) dense.push([q0[0] + ((q1[0] - q0[0]) * m) / steps, q0[1] + ((q1[1] - q0[1]) * m) / steps]);
+    }
+    return dense;
+  }
+
+  /**
+   * Маршрут с физикой «по-машинному»: на поворотах скорость падает, у остановок — плавный
+   * разгон и торможение. pose(сек) → положение, курс и скорость.
+   */
+  function Track(points, opts) {
+    opts = opts || {};
+    var p = smooth(points, opts.radius || 0.6, !!opts.closed);
+    var vmax = opts.speed || 1;
+    var head = [];
+    for (var i = 0; i < p.length; i++) {
+      var a = p[Math.max(0, i - 1)];
+      var b = p[Math.min(p.length - 1, i + 1)];
+      head.push(Math.atan2(b[1] - a[1], b[0] - a[0]));
+    }
+    var len = [0];
+    for (var j = 1; j < p.length; j++) len.push(len[j - 1] + Math.hypot(p[j][0] - p[j - 1][0], p[j][1] - p[j - 1][1]));
+    var total = len[len.length - 1];
+    var times = [0];
+    var speed = [vmax];
+    for (var k = 1; k < p.length; k++) {
+      // Кривизна: насколько меняется курс на ±6 шагов.
+      var h0 = head[Math.max(0, k - 6)];
+      var h1 = head[Math.min(p.length - 1, k + 6)];
+      var turn = Math.abs(Math.atan2(Math.sin(h1 - h0), Math.cos(h1 - h0)));
+      var v = vmax * Math.max(0.35, 1 - turn * 0.55);
+      if (opts.easeEnds) v *= Math.max(0.18, Math.min(1, len[k] / 1.4, (total - len[k]) / 1.6));
+      speed.push(v);
+      times.push(times[k - 1] + (len[k] - len[k - 1]) / v);
+    }
+    var duration = times[times.length - 1];
+    return {
+      duration: duration,
+      points: p,
+      pose: function (sec) {
+        var t = opts.loop ? ((sec % duration) + duration) % duration : Math.max(0, Math.min(duration, sec));
+        var lo = 0;
+        var hi = times.length - 1;
+        while (hi - lo > 1) {
+          var mid = (lo + hi) >> 1;
+          if (times[mid] <= t) lo = mid; else hi = mid;
+        }
+        var f = times[hi] > times[lo] ? (t - times[lo]) / (times[hi] - times[lo]) : 0;
+        var dh = Math.atan2(Math.sin(head[hi] - head[lo]), Math.cos(head[hi] - head[lo]));
+        return { x: p[lo][0] + (p[hi][0] - p[lo][0]) * f, y: p[lo][1] + (p[hi][1] - p[lo][1]) * f, heading: head[lo] + dh * f, v: speed[lo], index: lo };
+      },
+    };
+  }
+
+  /** Короб, повёрнутый на курс: перерисовывается каждый кадр (видимые грани + крыша). */
+  function OrientedBox(g, colors) {
+    var faces = [0, 1, 2, 3].map(function () { return el('polygon', {}, g); });
+    var top = el('polygon', { fill: colors.top }, g);
+    return function (cx, cy, heading, L, W, H, z, ox, oy) {
+      var c = Math.cos(heading);
+      var sn = Math.sin(heading);
+      var loc = [[-L / 2, -W / 2], [L / 2, -W / 2], [L / 2, W / 2], [-L / 2, W / 2]];
+      var base = loc.map(function (q) {
+        var lx = q[0] + (ox || 0);
+        var ly = q[1] + (oy || 0);
+        return [cx + lx * c - ly * sn, cy + lx * sn + ly * c];
+      });
+      for (var i = 0; i < 4; i++) {
+        var a = base[i];
+        var b = base[(i + 1) % 4];
+        var nx = b[1] - a[1];
+        var ny = -(b[0] - a[0]);
+        var f = faces[i];
+        if (nx + ny <= 0) { f.setAttribute('display', 'none'); continue; }
+        f.removeAttribute('display');
+        f.setAttribute('fill', nx > ny ? colors.right : colors.left);
+        f.setAttribute('points', pts([P(a[0], a[1], z), P(b[0], b[1], z), P(b[0], b[1], z + H), P(a[0], a[1], z + H)]));
+      }
+      top.setAttribute('points', pts(base.map(function (q) { return P(q[0], q[1], z + H); })));
+    };
+  }
+
+  /** Трактор / комбайн / бензовоз: колёса, корпус, кабина, маячок — всё по курсу. */
   function vehicle(g, colors, cab) {
     var grp = el('g', {}, g);
-    // Колёса, корпус, кабина (в 1,5 раза крупнее масштаба поля — как техника в пролётах).
-    box(grp, -0.6, -0.5, 0.3, 1.0, 0.3, { top: '#3A3F45', left: '#1E2126', right: '#2A2F35' }, 0);
-    box(grp, 0.35, -0.5, 0.3, 1.0, 0.3, { top: '#3A3F45', left: '#1E2126', right: '#2A2F35' }, 0);
-    box(grp, -0.7, -0.45, 1.4, 0.9, 0.5, colors, 0.18);
-    box(grp, cab ? -0.55 : -0.1, -0.38, 0.62, 0.76, 0.6, { top: '#DDE6EE', left: '#66727E', right: '#8794A1' }, 0.68);
-    el('circle', { cx: P(0, 0, 1.45)[0], cy: P(0, 0, 1.45)[1], r: 3.5, fill: C.lime, class: 'viz-blink' }, grp);
-    return grp;
+    var shadow = el('polygon', { fill: 'rgba(0,0,0,0.28)' }, grp);
+    var wheelsBack = OrientedBox(grp, { top: '#3A3F45', left: '#1E2126', right: '#2A2F35' });
+    var wheelsFront = OrientedBox(grp, { top: '#3A3F45', left: '#1E2126', right: '#2A2F35' });
+    var body = OrientedBox(grp, colors);
+    var cabin = OrientedBox(grp, { top: '#DDE6EE', left: '#66727E', right: '#8794A1' });
+    var beacon = el('circle', { r: 3.5, fill: C.lime, class: 'viz-blink' }, grp);
+    return {
+      update: function (x, y, heading, bob) {
+        var z = 0.02 + (bob || 0);
+        var c = Math.cos(heading);
+        var sn = Math.sin(heading);
+        var sh = [[-0.9, -0.55], [0.9, -0.55], [0.9, 0.55], [-0.9, 0.55]].map(function (q) { return P(x + q[0] * c - q[1] * sn + 0.12, y + q[0] * sn + q[1] * c + 0.12, 0.01); });
+        shadow.setAttribute('points', pts(sh));
+        wheelsBack(x, y, heading, 0.42, 1.05, 0.34, 0, -0.5, 0);
+        wheelsFront(x, y, heading, 0.36, 0.95, 0.3, 0, 0.55, 0);
+        body(x, y, heading, 1.55, 0.86, 0.42, 0.22 + z);
+        var cabX = cab ? 0.35 : -0.28;
+        cabin(x, y, heading, 0.62, 0.74, 0.58, 0.64 + z, cabX, 0);
+        var bp = P(x + cabX * c, y + cabX * sn, 1.32 + z);
+        beacon.setAttribute('cx', bp[0]);
+        beacon.setAttribute('cy', bp[1]);
+      },
+    };
   }
+
+  /** Перенос группы (дрон) в точку поля. */
   function moveTo(grp, x, y, z) {
     var o = P(0, 0, 0);
     var p = P(x, y, z || 0);
@@ -251,7 +384,7 @@
         chip(svg, [bsTop[0] + 14, bsTop[1] - 6], 'bs', C.lime),
         chip(svg, [hqTop[0] - 30, hqTop[1] - 34], 'hq', '#00E5FF'),
       ];
-      var path = [[1.5, 9], [10.5, 9], [10.5, 10.5], [1.5, 10.5], [1.5, 9]];
+      var combineTrack = Track([[1.6, 8.9], [10.4, 8.9], [10.4, 10.6], [1.6, 10.6]], { closed: true, loop: true, radius: 0.75, speed: 0.55 });
       return {
         labels: labels,
         frame: function (t) {
@@ -261,8 +394,8 @@
             r.setAttribute('cx', e.cx); r.setAttribute('cy', e.cy); r.setAttribute('rx', e.rx); r.setAttribute('ry', e.ry);
             r.setAttribute('opacity', (1 - ph) * 0.8);
           });
-          var c = along(path, t / 40);
-          moveTo(combine, c.x, c.y);
+          var c = combineTrack.pose(t);
+          combine.update(c.x, c.y, c.heading, Math.sin(t * 9) * 0.012);
           var dx = 8 + Math.sin(t / 3) * 1.6;
           var dy = 6 + Math.cos(t / 3) * 1.6;
           var dz = 2.4 + Math.sin(t * 2) * 0.12;
@@ -288,32 +421,54 @@
       field(g, 12, true);
       // Геозона.
       poly([P(1, 1, 0.03), P(11, 1, 0.03), P(11, 11, 0.03), P(1, 11, 0.03)], 'none', g, { stroke: '#00E5FF', 'stroke-width': 1.6, 'stroke-dasharray': '6 6', opacity: 0.8 });
-      var path = [];
-      for (var i = 0; i < 9; i++) {
-        var y = 1.6 + i * 1.1;
-        if (i % 2 === 0) path.push([1.6, y], [10.4, y]);
-        else path.push([10.4, y], [1.6, y]);
+      // Челнок: проходы вдоль рядов и развороты на краю поля по полукругу.
+      var rows = 8;
+      var gap = 1.15;
+      var xs = 2.2;
+      var xe = 9.8;
+      var route = [];
+      for (var i = 0; i < rows; i++) {
+        var y0 = 1.9 + i * gap;
+        var right = i % 2 === 0;
+        route.push([right ? xs : xe, y0], [right ? xe : xs, y0]);
+        if (i < rows - 1) {
+          for (var a = 1; a < 12; a++) {
+            var th = -Math.PI / 2 + (Math.PI * a) / 12;
+            var rx = (gap / 2) * Math.cos(th) * 1.35;
+            route.push([right ? xe + rx : xs - rx, y0 + gap / 2 + (gap / 2) * Math.sin(th)]);
+          }
+        }
       }
+      // Возврат по краю поля к началу — круг замкнут, трактор не «телепортируется».
+      var yl = 1.9 + (rows - 1) * gap;
+      var endX = (rows - 1) % 2 === 0 ? xe : xs;
+      route.push([endX === xe ? 10.9 : 1.1, yl + 0.3], [10.9, 1.0], [xs - 0.6, 1.0], [xs, 1.9]);
+      var trTrack = Track(route, { loop: true, radius: 0.35, speed: 0.62 });
+      var workEnd = trTrack.points.length;
+      // Индекс, где кончается работа (дальше — переезд к началу).
+      for (var wi = 0; wi < trTrack.points.length; wi++) { var q = trTrack.points[wi]; if (Math.abs(q[1] - yl) < 0.02 && Math.abs(q[0] - (endX === xe ? xe : xs)) < 0.06) { workEnd = wi; } }
       var trail = el('polyline', { fill: 'none', stroke: C.lime, 'stroke-width': 5, 'stroke-linecap': 'round', 'stroke-linejoin': 'round', opacity: 0.55 }, g);
-      var tractorG = vehicle(g, C.green, false);
+      var tractorV = vehicle(g, C.green, false);
       var zoneChip = chip(svg, [P(1, 11, 0)[0] - 10, P(1, 11, 0)[1] + 18], 'zone', '#00E5FF');
       var cardT = card(host);
-      var total = 0;
-      for (var j = 1; j < path.length; j++) total += Math.hypot(path[j][0] - path[j - 1][0], path[j][1] - path[j - 1][1]);
-      var last = -1;
+            var last = -1;
       return {
         labels: [zoneChip],
         frame: function (t) {
-          var k = (t / 60) % 1;
-          var p = along(path, k);
-          moveTo(tractorG, p.x, p.y);
-          var done = path.slice(0, p.seg + 1).concat([[p.x, p.y]]);
-          trail.setAttribute('points', pts(done.map(function (q) { return P(q[0], q[1], 0.04); })));
+          var p = trTrack.pose(t);
+          var k = (((t % trTrack.duration) + trTrack.duration) % trTrack.duration) / trTrack.duration;
+          tractorV.update(p.x, p.y, p.heading, Math.sin(t * 11) * 0.01);
+          // След: обработанная полоса — только рабочие проходы (переезд к началу не красим).
+          var upto = Math.min(p.index, workEnd);
+          var done = [];
+          for (var di = 0; di <= upto; di += 3) done.push(P(trTrack.points[di][0], trTrack.points[di][1], 0.04));
+          if (p.index <= workEnd) done.push(P(p.x, p.y, 0.04));
+          trail.setAttribute('points', pts(done));
           var sec = Math.floor(t);
           if (sec !== last) {
             last = sec;
-            var turning = Math.abs(p.x - 1.6) < 0.4 || Math.abs(p.x - 10.4) < 0.4;
-            var v = turning ? 6 + Math.random() * 2 : 11.5 + Math.random() * 1.5;
+            var turning = p.v < 0.5;
+            var v = (p.v / 0.62) * 12.5 + Math.random() * 0.6;
             cardT.set(tr('tractor'), [
               [tr('speed'), dec(v, 1) + ' ' + tr('kmh')],
               [tr('fuel'), Math.round(78 - k * 22) + ' %'],
@@ -347,6 +502,9 @@
       el('rect', { x: screen[0] - 7, y: screen[1] - 5, width: 14, height: 8, rx: 1.5, fill: '#00E5FF', opacity: 0.9 }, g);
       var hose = el('path', { fill: 'none', stroke: '#2B2F35', 'stroke-width': 3, 'stroke-linecap': 'round' }, g);
       var trk = vehicle(g, C.green, false);
+      var arrive = Track([[11.0, 10.9], [11.0, 8.6], [8.35, 8.0], [8.35, 5.0]], { radius: 0.9, speed: 0.8, easeEnds: true });
+      var depart = Track([[8.35, 5.0], [8.35, 2.4], [10.9, 1.2], [11.0, 10.9]], { radius: 0.9, speed: 0.8, easeEnds: true });
+      var DWELL = 8;
       var drops = el('g', {}, g);
       var dropEls = [];
       for (var i = 0; i < 6; i++) dropEls.push(el('circle', { r: 2.6, fill: 'var(--accent-amber)' }, drops));
@@ -360,22 +518,22 @@
       return {
         labels: [station, function () { syncT.textContent = tr('synced'); }],
         frame: function (t) {
-          // Цикл 16 с: подъезд 4 с, заправка 8 с, отъезд 4 с.
-          var c = t % 16;
-          var x;
-          if (c < 4) x = 12.5 - (c / 4) * 4.4;
-          else if (c < 12) x = 8.1;
-          else x = 8.1 - ((c - 12) / 4) * 7.5;
-          var y = c < 12 ? 5.4 : 5.4 + ((c - 12) / 4) * 4.5;
-          moveTo(trk, x, y);
-          var fueling = c >= 4.6 && c < 11.6;
-          var pumped = Math.max(0, Math.min(1, (c - 4.6) / 7)) * 120;
+          // Цикл: подъезд (плавное торможение) → заправка → отъезд по кругу (плавный разгон).
+          var cycle = arrive.duration + DWELL + depart.duration;
+          var c = ((t % cycle) + cycle) % cycle;
+          var pose = c < arrive.duration ? arrive.pose(c) : c < arrive.duration + DWELL ? arrive.pose(arrive.duration) : depart.pose(c - arrive.duration - DWELL);
+          var x = pose.x;
+          var y = pose.y;
+          trk.update(x, y, pose.heading, Math.sin(t * 10) * (c >= arrive.duration && c < arrive.duration + DWELL ? 0 : 0.01));
+          var fs = arrive.duration + 0.6;
+          var fueling = c >= fs && c < arrive.duration + DWELL - 0.4;
+          var pumped = Math.max(0, Math.min(1, (c - fs) / (DWELL - 1))) * 120;
           var tankL = 8200 - (Math.floor(t / 16) % 5) * 120 - pumped;
           var frac = tankL / 10000;
           level.setAttribute('y', tc[1] - 4 - (H - 10) * frac);
           level.setAttribute('height', (H - 10) * frac);
           var a = P(7.3, 4.8, 0.6);
-          var b = P(x, y, 0.6);
+          var b = P(x - 0.45, y, 0.7);
           hose.setAttribute('d', fueling ? 'M' + a[0] + ' ' + a[1] + ' Q' + (a[0] + b[0]) / 2 + ' ' + (Math.max(a[1], b[1]) + 18) + ' ' + b[0] + ' ' + b[1] : '');
           dropEls.forEach(function (d, k) {
             var ph = (t * 1.4 + k / dropEls.length) % 1;
@@ -383,7 +541,7 @@
             d.setAttribute('cx', a[0] + (b[0] - a[0]) * ph);
             d.setAttribute('cy', a[1] + (b[1] - a[1]) * ph + Math.sin(ph * Math.PI) * 14);
           });
-          syncG.setAttribute('opacity', c > 11.6 && c < 15 ? 1 : 0);
+          syncG.setAttribute('opacity', c > arrive.duration + DWELL - 0.4 && c < arrive.duration + DWELL + 3 ? 1 : 0);
           var shown = Math.round(pumped) + '|' + Math.round(tankL / 10) + '|' + lang();
           if (shown !== lastShown) {
             lastShown = shown;
@@ -419,6 +577,8 @@
         if (r % 2 === 0) path.push([1 + cell / 2, yy], [11 - cell / 2, yy]);
         else path.push([11 - cell / 2, yy], [1 + cell / 2, yy]);
       }
+      path.push([1 + cell / 2, 1 + cell / 2 - 0.01]);
+      var droneTrack = Track(path, { loop: true, radius: 0.45, speed: 0.95 });
       var cone = el('polygon', { fill: '#00E5FF', opacity: 0.16 }, g);
       var drone = el('g', {}, g);
       var d0 = P(0, 0, 0);
@@ -437,8 +597,8 @@
       return {
         labels: [legend, function () { detT.textContent = tr('person') + ' · 92 %'; lastPct = -1; }],
         frame: function (t) {
-          var k = (t / 48) % 1;
-          var p = along(path, k);
+          var p = droneTrack.pose(t);
+          var k = (((t % droneTrack.duration) + droneTrack.duration) % droneTrack.duration) / droneTrack.duration;
           moveTo(drone, p.x, p.y, 3 + Math.sin(t * 2.2) * 0.1);
           var a = P(p.x - 0.7, p.y - 0.7, 0.05);
           var b = P(p.x + 0.7, p.y - 0.7, 0.05);
