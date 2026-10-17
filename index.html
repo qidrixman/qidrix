@@ -502,6 +502,24 @@
             box-shadow: 0 0 20px rgba(0, 229, 255, 0.3);
         }
         .contact-link svg { width: 20px; height: 20px; }
+        /* ПК: как остальные секции — заголовок слева, карточка во всю ширину, раскладка вбок */
+        @media (min-width: 769px) {
+            #slide-6 { align-items: stretch; text-align: left; }
+            .contact-card {
+                max-width: none; margin: 28px 0 0; padding: 32px 36px; border-top: 1px solid var(--border);
+                display: grid; grid-template-columns: auto minmax(0, 1fr) auto; column-gap: 32px; align-items: center; text-align: left;
+                grid-template-areas: "avatar name links" "avatar role links" "avatar loc links" "avatar text links";
+            }
+            .contact-card:hover { border-top-color: var(--accent-cyan); }
+            .contact-card::before { top: -140px; left: 0; transform: none; }
+            .contact-avatar-wrap { grid-area: avatar; margin: 0; }
+            .contact-name { grid-area: name; align-self: end; }
+            .contact-role { grid-area: role; }
+            .contact-location { grid-area: loc; justify-self: start; margin-bottom: 10px; }
+            .contact-card p { grid-area: text; align-self: start; max-width: 460px; margin: 0; }
+            .contact-divider { display: none; }
+            .contact-links { grid-area: links; padding-left: 32px; border-left: 1px solid var(--border); align-self: stretch; align-items: center; flex-wrap: nowrap; gap: 12px; }
+        }
         @media (max-width: 768px) {
             .contact-card { padding: 32px 20px 24px; }
             .contact-avatar { width: 96px; height: 96px; }
