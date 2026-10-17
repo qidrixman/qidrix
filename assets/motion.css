@@ -1,0 +1,90 @@
+/*
+ * Qidrix · движение на сайте (общий файл для всех страниц, подключается после стилей страницы).
+ * Появление блоков при прокрутке, прогресс чтения, «бегунок» в меню, посадка на раздел,
+ * плотная шапка, подсветка карточек за курсором, плавные переходы между страницами.
+ * Всё отключается при «уменьшении движения» и без JavaScript (класс motion ставит motion.js).
+ */
+
+/* Плавный переход между страницами сайта (браузеры с View Transitions) */
+@view-transition { navigation: auto; }
+header { view-transition-name: site-header; }
+::view-transition-old(root) { animation: 260ms cubic-bezier(0.4, 0, 1, 1) both qx-vt-out; }
+::view-transition-new(root) { animation: 420ms cubic-bezier(0.2, 0.7, 0.2, 1) both qx-vt-in; }
+@keyframes qx-vt-out { to { opacity: 0; transform: translateY(-8px); } }
+@keyframes qx-vt-in { from { opacity: 0; transform: translateY(14px); } }
+
+/* Появление при прокрутке */
+html.motion .reveal {
+    opacity: 0;
+    transform: translate3d(0, 28px, 0) scale(0.985);
+    transition: opacity 0.8s cubic-bezier(0.2, 0.7, 0.2, 1), transform 0.9s cubic-bezier(0.2, 0.7, 0.2, 1);
+    transition-delay: var(--reveal-delay, 0ms);
+    will-change: opacity, transform;
+}
+html.motion .reveal.reveal--side { transform: translate3d(-36px, 0, 0); }
+html.motion .reveal.reveal--zoom { transform: scale(0.94); }
+html.motion .reveal.is-in { opacity: 1; transform: none; }
+
+/* Заголовки разделов: «линия-сканер» под моно-подписью при появлении */
+html.motion .mono.reveal { position: relative; }
+html.motion .mono.reveal::after {
+    content: ''; position: absolute; left: 0; bottom: -6px; height: 2px; width: 64px;
+    background: linear-gradient(90deg, var(--accent-cyan), transparent);
+    transform: scaleX(0); transform-origin: left; transition: transform 0.9s 0.25s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+html.motion .mono.reveal.is-in::after { transform: scaleX(1); }
+.case-overview .mono::after, #slide-6 .mono::after, .hero-content-overlay .mono::after { left: 50% !important; margin-left: -32px; }
+
+/* Прогресс чтения под шапкой */
+.scroll-progress {
+    position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; pointer-events: none;
+    background: linear-gradient(90deg, var(--accent-cyan), #C2FF41);
+    transform: scaleX(var(--progress, 0)); transform-origin: left;
+    box-shadow: 0 0 10px rgba(0, 229, 255, 0.6);
+}
+
+/* Плотная шапка после начала прокрутки */
+header { transition: background-color 0.4s ease, box-shadow 0.4s ease; }
+header nav { transition: height 0.35s cubic-bezier(0.2, 0.7, 0.2, 1); }
+header.is-scrolled { box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25); }
+header.is-scrolled nav { height: 66px; }
+
+/* «Бегунок» под активным пунктом меню */
+.nav-links { position: relative; }
+.nav-indicator {
+    position: absolute; left: 0; bottom: -10px; height: 2px; width: 0; border-radius: 2px; pointer-events: none;
+    background: var(--accent-cyan); box-shadow: 0 0 12px var(--accent-cyan); opacity: 0;
+    transition: transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1), width 0.45s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.3s;
+}
+.nav-indicator.is-on { opacity: 1; }
+.nav-links a { transition: color 0.3s; }
+
+/* Посадка на раздел, выбранный в меню */
+section.is-landing .mono { animation: qx-land-label 1.2s cubic-bezier(0.2, 0.7, 0.2, 1); }
+section.is-landing::before {
+    content: ''; position: absolute; left: 0; right: 0; top: 0; height: 2px; z-index: 1; pointer-events: none;
+    background: linear-gradient(90deg, transparent, var(--accent-cyan), #C2FF41, transparent);
+    animation: qx-land-sweep 1.2s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+@keyframes qx-land-sweep { from { transform: scaleX(0); opacity: 1; } 60% { transform: scaleX(1); opacity: 1; } to { transform: scaleX(1); opacity: 0; } }
+@keyframes qx-land-label { 0% { text-shadow: none; } 30% { text-shadow: 0 0 18px var(--accent-cyan); letter-spacing: 3px; } 100% { text-shadow: none; } }
+
+/* Подсветка карточек за курсором */
+.qx-glow { position: relative; isolation: isolate; }
+.qx-glow::after {
+    content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; z-index: -1; opacity: 0;
+    background: radial-gradient(360px circle at var(--mx, 50%) var(--my, 50%), rgba(0, 229, 255, 0.12), transparent 60%);
+    transition: opacity 0.35s;
+}
+.qx-glow:hover::after { opacity: 1; }
+
+/* Лёгкий параллакс фона первого экрана */
+html.motion .hero-bg-video { transform: translate3d(0, var(--parallax, 0px), 0) scale(1.06); will-change: transform; }
+
+@media (prefers-reduced-motion: reduce) {
+    @view-transition { navigation: none; }
+    html.motion .reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
+    .nav-indicator, header nav, .qx-glow::after { transition: none !important; }
+    section.is-landing .mono, section.is-landing::before { animation: none !important; }
+    html.motion .hero-bg-video { transform: none !important; }
+}

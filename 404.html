@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex">
+    <meta name="color-scheme" content="dark light">
+    <meta name="theme-color" content="#121417">
+    <title>Страница не найдена · Qidrix</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23121417'/%3E%3Cpath d='M22 22H70V56H56V36H36V56H56V70H22Z' fill='%23F3F4F6'/%3E%3Crect x='56' y='56' width='22' height='22' fill='%2300E5FF'/%3E%3C/svg%3E">
+    <link rel="stylesheet" href="/assets/fonts/fonts.css">
+    <style>
+        :root { --bg-main: #121417; --bg-panel: #1E2126; --text-main: #F3F4F6; --text-muted: #9CA3AF; --accent-cyan: #00E5FF; --grid-line: rgba(0, 229, 255, 0.05); }
+        @media (prefers-color-scheme: light) { :root { --bg-main: #F8FAFC; --bg-panel: #FFFFFF; --text-main: #0F172A; --text-muted: #475569; --accent-cyan: #0284C7; --grid-line: rgba(2, 132, 199, 0.05); } }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { min-height: 100vh; display: grid; place-items: center; padding: 24px 16px; font-family: 'Inter', sans-serif; background: var(--bg-main); color: var(--text-main);
+            background-image: linear-gradient(var(--grid-line) 1px, transparent 1px), linear-gradient(90deg, var(--grid-line) 1px, transparent 1px); background-size: 40px 40px; }
+        main { max-width: 520px; text-align: center; }
+        .logo { display: inline-flex; align-items: center; gap: 12px; margin-bottom: 36px; color: var(--text-main); text-decoration: none; font-size: 24px; font-weight: 800; letter-spacing: -1px; }
+        .logo span { color: var(--accent-cyan); }
+        .mono { display: block; margin-bottom: 12px; font-family: 'Fira Code', monospace; font-size: 13px; letter-spacing: 2px; text-transform: uppercase; color: var(--accent-cyan); }
+        h1 { font-size: 40px; font-weight: 800; letter-spacing: -1.5px; line-height: 1.1; margin-bottom: 14px; }
+        p { color: var(--text-muted); line-height: 1.5; margin-bottom: 28px; }
+        a.btn { display: inline-flex; padding: 12px 26px; border-radius: 30px; background: var(--accent-cyan); color: var(--bg-main); font-weight: 600; text-decoration: none; box-shadow: 0 0 20px rgba(0, 229, 255, 0.25); }
+        a:focus-visible { outline: 2px solid var(--accent-cyan); outline-offset: 3px; }
+    </style>
+</head>
+<body>
+    <main>
+        <a class="logo" href="/" aria-label="Qidrix — на главную">
+            <svg width="34" height="34" viewBox="0 0 100 100" aria-hidden="true"><path d="M 10 10 H 80 V 60 H 60 V 30 H 30 V 60 H 60 V 80 H 10 Z" fill="currentColor"/><rect x="60" y="60" width="30" height="30" fill="#00E5FF"/></svg>
+            <div>Qidri<span>x</span></div>
+        </a>
+        <span class="mono">404</span>
+        <h1 id="t">Такой страницы нет</h1>
+        <p id="d">Возможно, ссылка устарела. Решения, кейсы и демо-карьер — на главной.</p>
+        <a class="btn" id="b" href="/">На главную</a>
+    </main>
+    <script>
+        (function () {
+            var L = { en: ['Page not found', 'The link may be out of date. Solutions, cases and the demo mine are on the home page.', 'Go home'],
+                      kk: ['Мұндай бет жоқ', 'Сілтеме ескірген болуы мүмкін. Шешімдер, кейстер және демо-карьер — басты бетте.', 'Басты бетке'],
+                      uz: ['Bunday sahifa yoʻq', 'Havola eskirgan boʻlishi mumkin. Yechimlar, keyslar va demo karyer — bosh sahifada.', 'Bosh sahifaga'] };
+            var lang = 'ru';
+            try { lang = localStorage.getItem('qidrix_lang') || 'ru'; } catch (e) {}
+            if (!L[lang]) return;
+            document.documentElement.lang = lang;
+            document.getElementById('t').textContent = L[lang][0];
+            document.getElementById('d').textContent = L[lang][1];
+            document.getElementById('b').textContent = L[lang][2];
+            document.title = L[lang][0] + ' · Qidrix';
+        })();
+    </script>
+</body>
+</html>

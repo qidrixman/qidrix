@@ -5,10 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Кейс Qidrix: оцифровка карьерной спецтехники — ретрансляторы, шкафы питания, бортовые системы и телеметрия.">
     <link rel="canonical" href="https://qidrix.asia/digimine/">
+    <meta name="color-scheme" content="dark light">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Qidrix">
+    <meta property="og:locale" content="ru_RU">
+    <meta property="og:title" content="Оцифровка карьерной спецтехники — кейс Qidrix">
+    <meta property="og:description" content="Кейс Qidrix: оцифровка карьерной спецтехники — ретрансляторы, шкафы питания, бортовые системы и телеметрия.">
+    <meta property="og:url" content="https://qidrix.asia/digimine/">
+    <meta property="og:image" content="https://qidrix.asia/assets/img/og.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta name="twitter:card" content="summary_large_image">
     <meta name="theme-color" content="#121417">
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23121417'/%3E%3Cpath d='M22 22H70V56H56V36H36V56H56V70H22Z' fill='%23F3F4F6'/%3E%3Crect x='56' y='56' width='22' height='22' fill='%2300E5FF'/%3E%3C/svg%3E">
     <title>Qidrix | Кейс: Цифровой карьер</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="preload" href="../assets/fonts/Inter-400-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="../assets/fonts/fonts.css">
     
     <script>
         if ('scrollRestoration' in history) {
@@ -22,7 +35,7 @@
         window.scrollTo(0, 0);
         // Тему применяем до отрисовки, чтобы не было вспышки светлой темы
         try {
-            document.documentElement.setAttribute('data-theme', localStorage.getItem('qidrix_theme') || 'dark');
+            document.documentElement.setAttribute('data-theme', localStorage.getItem('qidrix_theme') || (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'));
         } catch (e) {}
     </script>
 
@@ -448,16 +461,43 @@
         }
         .footer-social-link:hover { color: var(--accent-cyan); border-color: var(--accent-cyan); transform: translateY(-3px); box-shadow: 0 0 20px rgba(0, 229, 255, 0.3); }
         .footer-social-link svg { width: 18px; height: 18px; }
+        /* Обзор проекта (перенесено с первого экрана) */
+        .case-overview { align-items: center; text-align: center; padding: 70px 8vw; }
+        .case-overview p { max-width: 760px; margin: 0 auto 28px; font-size: 18px; }
+        .overview-facts { list-style: none; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; width: 100%; max-width: 1000px; margin: 0 auto; }
+        .overview-facts li { display: flex; flex-direction: column; gap: 6px; padding: 20px; border-radius: 12px; background: var(--bg-panel); border: 1px solid var(--border); border-top: 2px solid var(--accent-cyan); box-shadow: var(--shadow); text-align: left; }
+        .overview-facts b { font-family: 'Fira Code', monospace; font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--accent-cyan); }
+        .overview-facts span { font-size: 15px; color: var(--text-main); font-weight: 600; }
+        /* Фото в своих пропорциях: объект в кадре, без случайной обрезки */
+        .case-grid:has(.image-wrapper.fit) { align-items: center; }
+        .images-row:has(.fit) { align-items: start; height: auto; }
+        .images-group:has(.fit) { height: auto; }
+        .image-wrapper.fit { aspect-ratio: var(--ar); height: auto; min-height: 0; flex: none; }
+        .image-wrapper.fit img { object-position: var(--pos); }
+        .case-grid > .image-wrapper.fit { width: 100%; max-width: min(100%, calc(620px * var(--ar))); justify-self: center; }
+        @media (max-width: 968px) {
+            .overview-facts { grid-template-columns: 1fr; }
+            .images-row:has(.fit) { grid-template-columns: 1fr 1fr; gap: 12px; }
+            .image-wrapper.fit { aspect-ratio: var(--ar); height: auto; }
+            .case-grid > .image-wrapper.fit { max-width: min(100%, calc(520px * var(--ar))); }
+        }
+        /* Доступность: ссылка «к содержимому», видимый фокус */
+        .skip-link { position: absolute; left: 16px; top: -60px; z-index: 3000; padding: 10px 16px; border-radius: 20px; background: var(--accent-cyan); color: var(--bg-main); font-weight: 600; text-decoration: none; transition: top 0.2s; }
+        .skip-link:focus { top: 12px; }
+        main:focus { outline: none; }
+        a:focus-visible, button:focus-visible, select:focus-visible { outline: 2px solid var(--accent-cyan); outline-offset: 3px; }
     </style>
+    <link rel="stylesheet" href="../assets/motion.css">
 </head>
 <body>
+    <a class="skip-link" href="#content" data-ru="Перейти к содержимому" data-en="Skip to content" data-kk="Мазмұнға өту" data-uz="Asosiy qismga oʻtish">Перейти к содержимому</a>
 
     <div class="grid-bg"></div>
 
     <header>
         <div class="container">
             <nav>
-                <a href="../" class="logo" aria-label="Qidrix">
+                <a href="../" class="logo" aria-label="Qidrix — на главную">
                     <svg class="logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
                         <path d="M 10 10 H 80 V 60 H 60 V 30 H 30 V 60 H 60 V 80 H 10 Z" class="svg-fill-main" />
                         <rect x="60" y="60" width="30" height="30" class="svg-fill-cyan" />
@@ -481,14 +521,14 @@
                         <span data-ru="Демо-карьер" data-en="Demo mine" data-kk="Демо-карьер" data-uz="Demo karyer">Демо-карьер</span>
                     </a>
 
-                    <button class="theme-toggle-btn icon-btn" onclick="toggleTheme()" aria-label="Toggle Theme" id="themeBtn">
+                    <button class="theme-toggle-btn icon-btn" onclick="toggleTheme()" aria-label="Сменить тему" data-aria-ru="Сменить тему" data-aria-en="Toggle theme" data-aria-kk="Тақырыпты ауыстыру" data-aria-uz="Mavzuni almashtirish" id="themeBtn">
                         <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
                         </svg>
                     </button>
 
                     <div class="lang-dropdown" id="langDropdown">
-                        <button class="lang-menu-btn" onclick="toggleDropdown(event)" aria-label="Select Language">
+                        <button class="lang-menu-btn" onclick="toggleDropdown(event)" aria-label="Выбрать язык" data-aria-ru="Выбрать язык" data-aria-en="Choose language" data-aria-kk="Тілді таңдау" data-aria-uz="Tilni tanlash" aria-haspopup="true">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <circle cx="12" cy="12" r="10"></circle>
                                 <line x1="2" y1="12" x2="22" y2="12"></line>
@@ -504,7 +544,7 @@
                         </div>
                     </div>
 
-                    <button class="burger-btn" onclick="toggleMenu()" aria-label="Menu">
+                    <button class="burger-btn" onclick="toggleMenu()" aria-label="Меню" data-aria-ru="Меню" data-aria-en="Menu" data-aria-kk="Мәзір" data-aria-uz="Menyu" aria-controls="sidePanel">
                         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <line x1="3" y1="12" x2="21" y2="12"></line>
                             <line x1="3" y1="6" x2="21" y2="6"></line>
@@ -518,7 +558,7 @@
 
     <div class="panel-overlay" id="panelOverlay" onclick="toggleMenu()"></div>
     <div class="side-panel" id="sidePanel">
-        <button class="close-btn" onclick="toggleMenu()" aria-label="Close">
+        <button class="close-btn" onclick="toggleMenu()" aria-label="Закрыть меню" data-aria-ru="Закрыть меню" data-aria-en="Close menu" data-aria-kk="Мәзірді жабу" data-aria-uz="Menyuni yopish">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <line x1="18" y1="6" x2="6" y2="18"></line>
                 <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -539,18 +579,20 @@
         </div>
     </div>
 
-    <div class="nav-dots">
-        <a href="#case-hero" title="Начало"></a>
-        <a href="#step-1" title="Инфраструктура"></a>
-        <a href="#step-2" title="Питание"></a>
-        <a href="#step-3" title="Монтаж"></a>
-        <a href="#step-4" title="Телеметрия"></a>
-        <a href="#step-5" title="Операторская среда"></a>
-    </div>
+    <nav class="nav-dots" aria-label="Разделы страницы">
+        <a href="#case-hero" title="Начало" aria-label="Начало"></a>
+        <a href="#overview" title="Обзор" aria-label="Обзор"></a>
+        <a href="#step-1" title="Инфраструктура" aria-label="Инфраструктура"></a>
+        <a href="#step-2" title="Питание" aria-label="Питание"></a>
+        <a href="#step-3" title="Монтаж" aria-label="Монтаж"></a>
+        <a href="#step-4" title="Телеметрия" aria-label="Телеметрия"></a>
+        <a href="#step-5" title="Операторская среда" aria-label="Операторская среда"></a>
+    </nav>
 
+    <main id="content" tabindex="-1">
     <!-- КЕЙС: Главный экран (как на стартовой) -->
     <section id="case-hero">
-        <video autoplay loop muted playsinline class="hero-bg-video" oncanplay="this.playbackRate=0.75">
+        <video autoplay loop muted playsinline disablepictureinpicture preload="auto" poster="video-poster.webp" aria-hidden="true" class="hero-bg-video" oncanplay="this.playbackRate=0.75">
             <source src="video.mp4" type="video/mp4">
         </video>
 
@@ -560,13 +602,23 @@
             <span class="mono" data-ru="РЕАЛИЗОВАННЫЙ ПРОЕКТ" data-en="IMPLEMENTED PROJECT" data-kk="ІСКЕ АСЫРЫЛҒАН ЖОБА" data-uz="AMALGA OSHIRILGAN LOYIHA">РЕАЛИЗОВАННЫЙ ПРОЕКТ</span>
             <h1 data-ru="Оцифровка спецтехники в горных условиях" data-en="Digitization of special equipment in mining conditions" data-kk="Тау-кен жағдайында арнайы техниканы цифрландыру" data-uz="Tog'-kon sharoitida maxsus texnikani raqamlashtirish">Оцифровка спецтехники в горных условиях</h1>
             <p style="font-size: 20px; color: var(--text-main); margin-bottom: 20px;" data-ru="Интеграция систем АСУ ГТК, высокоточного позиционирования и связи для тяжелой карьерной техники." data-en="Integration of ACS MTC, high-precision positioning and communication systems for heavy mining equipment." data-kk="Ауыр карьерлік техника үшін ТКК АБЖ, жоғары дәлдіктегі позициялау және байланыс жүйелерін біріктіру." data-uz="Og'ir kon texnikasi uchun ATB, yuqori aniqlikdagi joylashuv va aloqa tizimlarini integratsiyalash.">Интеграция систем АСУ ГТК, высокоточного позиционирования и связи для тяжелой карьерной техники.</p>
-            <p data-ru="Комплексный подход к диспетчеризации горнорудного транспорта. От установки автономных ретрансляторов до монтажа бортовых компьютеров и V2X антенн. Связываем оборудование с единым центром управления предприятием." data-en="A comprehensive approach to the dispatching of mining transport. From the installation of autonomous repeaters to the mounting of onboard computers and V2X antennas. We connect the equipment to a single enterprise control center." data-kk="Тау-кен көлігін диспетчерлендірудің кешенді тәсілі. Автономды ретрансляторларды орнатудан бастап борттық компьютерлер мен V2X антенналарын монтаждауға дейін. Біз жабдықты кәсіпорынның бірыңғай басқару орталығымен байланыстырамыз." data-uz="Tog'-kon transportini dispetcherlashtirishga kompleks yondashuv. Avtonom retranslyatorlarni o'rnatishdan tortib, bort kompyuterlari va V2X antennalarini montaj qilishgacha. Uskunalarni korxonaning yagona boshqaruv markaziga ulaymiz.">Комплексный подход к диспетчеризации горнорудного транспорта. От установки автономных ретрансляторов до монтажа бортовых компьютеров и V2X антенн. Связываем оборудование с единым центром управления предприятием.</p>
 
             <a href="#step-1" class="hero-bounce-btn">
                 <span data-ru="Решения" data-en="Solutions" data-kk="Шешімдер" data-uz="Yechimlar">Решения</span>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
             </a>
         </div>
+    </section>
+
+    <!-- Обзор проекта: подробности вынесены с первого экрана -->
+    <section id="overview" class="case-overview">
+        <span class="mono" data-ru="Обзор проекта" data-en="Project overview" data-kk="Жобаға шолу" data-uz="Loyiha sharhi">Обзор проекта</span>
+        <p data-ru="Комплексный подход к диспетчеризации горнорудного транспорта. От установки автономных ретрансляторов до монтажа бортовых компьютеров и V2X антенн. Связываем оборудование с единым центром управления предприятием." data-en="A comprehensive approach to the dispatching of mining transport. From the installation of autonomous repeaters to the mounting of onboard computers and V2X antennas. We connect the equipment to a single enterprise control center." data-kk="Тау-кен көлігін диспетчерлендірудің кешенді тәсілі. Автономды ретрансляторларды орнатудан бастап борттық компьютерлер мен V2X антенналарын монтаждауға дейін. Біз жабдықты кәсіпорынның бірыңғай басқару орталығымен байланыстырамыз." data-uz="Tog'-kon transportini dispetcherlashtirishga kompleks yondashuv. Avtonom retranslyatorlarni o'rnatishdan tortib, bort kompyuterlari va V2X antennalarini montaj qilishgacha. Uskunalarni korxonaning yagona boshqaruv markaziga ulaymiz.">Комплексный подход к диспетчеризации горнорудного транспорта. От установки автономных ретрансляторов до монтажа бортовых компьютеров и V2X антенн. Связываем оборудование с единым центром управления предприятием.</p>
+        <ul class="overview-facts">
+            <li><b data-ru="Ретрансляторы" data-en="Repeaters" data-kk="Ретрансляторлар" data-uz="Retranslyatorlar">Ретрансляторы</b><span data-ru="автономные, на солнечной энергии" data-en="autonomous, solar-powered" data-kk="автономды, күн энергиясымен" data-uz="avtonom, quyosh energiyasida">автономные, на солнечной энергии</span></li>
+            <li><b data-ru="Борт" data-en="Onboard" data-kk="Борт" data-uz="Bort">Борт</b><span data-ru="компьютеры, GNSS и V2X-антенны" data-en="computers, GNSS and V2X antennas" data-kk="компьютерлер, GNSS және V2X антенналары" data-uz="kompyuterlar, GNSS va V2X antennalari">компьютеры, GNSS и V2X-антенны</span></li>
+            <li><b data-ru="Центр" data-en="Control" data-kk="Орталық" data-uz="Markaz">Центр</b><span data-ru="единая диспетчерская предприятия" data-en="one enterprise control room" data-kk="кәсіпорынның бірыңғай диспетчерлігі" data-uz="korxonaning yagona dispetcherligi">единая диспетчерская предприятия</span></li>
+        </ul>
     </section>
 
     <section id="step-1">
@@ -591,10 +643,10 @@
             </div>
             
             <div class="images-row">
-                <div class="image-wrapper">
+                <div class="image-wrapper fit" style="--ar: 0.57; --pos: 50% 62%;">
                     <img src="IMG_20250708_170304.webp" loading="lazy" decoding="async" alt="Autonomous Relay Station">
                 </div>
-                <div class="image-wrapper">
+                <div class="image-wrapper fit" style="--ar: 0.61; --pos: 45% 62%;">
                     <img src="IMG_20250907_085708.webp" loading="lazy" decoding="async" alt="Solar Panel and Cabinet">
                 </div>
             </div>
@@ -622,7 +674,7 @@
                 </div>
             </div>
             
-            <div class="image-wrapper">
+            <div class="image-wrapper fit" style="--ar: 0.70; --pos: 50% 50%;">
                 <img src="IMG_20250907_085700.webp" loading="lazy" decoding="async" alt="Power Distribution Cabinet Inside">
             </div>
         </div>
@@ -650,10 +702,10 @@
             </div>
             
             <div class="images-row">
-                <div class="image-wrapper">
+                <div class="image-wrapper fit" style="--ar: 0.56; --pos: 55% 30%;">
                     <img src="IMG_20250907_090401.webp" loading="lazy" decoding="async" alt="Heavy Machinery Antennas">
                 </div>
-                <div class="image-wrapper">
+                <div class="image-wrapper fit" style="--ar: 0.56; --pos: 45% 28%;">
                     <img src="IMG_20250715_155110.webp" loading="lazy" decoding="async" alt="Volvo Cabin External Systems">
                 </div>
             </div>
@@ -681,7 +733,7 @@
                 </div>
             </div>
             
-            <div class="image-wrapper">
+            <div class="image-wrapper fit" style="--ar: 0.83; --pos: 45% 45%;">
                 <img src="IMG_20250907_094329.webp" loading="lazy" decoding="async" alt="Telemetry Open Cabinet on Machinery">
             </div>
         </div>
@@ -709,15 +761,17 @@
             </div>
             
             <div class="images-group">
-                <div class="image-wrapper">
+                <div class="image-wrapper fit" style="--ar: 1.50; --pos: 62% 50%;">
                     <img src="IMG_20250907_094407.webp" loading="lazy" decoding="async" alt="Cabin Interior Hexagon System">
                 </div>
-                <div class="image-wrapper">
+                <div class="image-wrapper fit" style="--ar: 1.88; --pos: 50% 45%;">
                     <img src="IMG_20250907_094354.webp" loading="lazy" decoding="async" alt="Cabin Dashboard and Camera">
                 </div>
             </div>
         </div>
     </section>
+
+    </main>
 
     <footer>
         <div class="container footer-content">
@@ -843,7 +897,7 @@
                 savedLang = localStorage.getItem('qidrix_lang');
             } catch (e) {}
 
-            const currentTheme = savedTheme ? savedTheme : 'dark';
+            const currentTheme = savedTheme ? savedTheme : (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
             document.documentElement.setAttribute('data-theme', currentTheme);
             updateThemeIcon(currentTheme);
             setLang(savedLang ? savedLang : 'ru');
@@ -854,5 +908,7 @@
             }
         });
     </script>
+    <script src="../assets/motion.js" defer></script>
+    <script src="../assets/site.js" defer></script>
 </body>
 </html>

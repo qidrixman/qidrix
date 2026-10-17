@@ -5,10 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Qidrix — интегратор промышленных инноваций: радиомосты, SCADA, телеметрия, ИИ-аналитика и диспетчеризация карьеров.">
     <link rel="canonical" href="https://qidrix.asia/">
+    <meta name="color-scheme" content="dark light">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Qidrix">
+    <meta property="og:locale" content="ru_RU">
+    <meta property="og:title" content="Qidrix — интегратор промышленных инноваций">
+    <meta property="og:description" content="Qidrix — интегратор промышленных инноваций: радиомосты, SCADA, телеметрия, ИИ-аналитика и диспетчеризация карьеров.">
+    <meta property="og:url" content="https://qidrix.asia/">
+    <meta property="og:image" content="https://qidrix.asia/assets/img/og.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta name="twitter:card" content="summary_large_image">
     <meta name="theme-color" content="#121417">
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23121417'/%3E%3Cpath d='M22 22H70V56H56V36H36V56H56V70H22Z' fill='%23F3F4F6'/%3E%3Crect x='56' y='56' width='22' height='22' fill='%2300E5FF'/%3E%3C/svg%3E">
     <title>Qidrix | Интегратор промышленных инноваций</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="preload" href="assets/fonts/Inter-400-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="assets/fonts/fonts.css">
     
     <script>
         if ('scrollRestoration' in history) {
@@ -22,7 +35,7 @@
         window.scrollTo(0, 0);
         // Тему применяем до отрисовки, чтобы не было вспышки светлой темы
         try {
-            document.documentElement.setAttribute('data-theme', localStorage.getItem('qidrix_theme') || 'dark');
+            document.documentElement.setAttribute('data-theme', localStorage.getItem('qidrix_theme') || (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'));
         } catch (e) {}
     </script>
 
@@ -546,16 +559,24 @@
         }
         .footer-social-link:hover { color: var(--accent-cyan); border-color: var(--accent-cyan); transform: translateY(-3px); box-shadow: 0 0 20px rgba(0, 229, 255, 0.3); }
         .footer-social-link svg { width: 18px; height: 18px; }
+        /* Доступность: ссылка «к содержимому», видимый фокус */
+        .skip-link { position: absolute; left: 16px; top: -60px; z-index: 3000; padding: 10px 16px; border-radius: 20px; background: var(--accent-cyan); color: var(--bg-main); font-weight: 600; text-decoration: none; transition: top 0.2s; }
+        .skip-link:focus { top: 12px; }
+        main:focus { outline: none; }
+        a:focus-visible, button:focus-visible, select:focus-visible { outline: 2px solid var(--accent-cyan); outline-offset: 3px; }
     </style>
+    <link rel="stylesheet" href="assets/motion.css">
+    <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Organization", "name": "Qidrix", "url": "https://qidrix.asia/", "logo": "https://qidrix.asia/assets/img/og.jpg", "description": "Интегратор промышленных инноваций: радиосети, SCADA, телеметрия, диспетчеризация и ИИ-аналитика для промышленности.", "areaServed": ["KZ", "UZ"], "contactPoint": [{"@type": "ContactPoint", "contactType": "sales", "name": "Тимур Салихов", "telephone": "+7-777-256-53-89", "email": "timur.salikhov@avatech.kz", "availableLanguage": ["ru", "en", "kk", "uz"]}], "sameAs": ["https://www.linkedin.com/in/timursalikhov", "https://t.me/timuverse"]}</script>
 </head>
 <body>
+    <a class="skip-link" href="#content" data-ru="Перейти к содержимому" data-en="Skip to content" data-kk="Мазмұнға өту" data-uz="Asosiy qismga oʻtish">Перейти к содержимому</a>
 
     <div class="grid-bg"></div>
 
     <header>
         <div class="container">
             <nav>
-                <a href="./" class="logo" aria-label="Qidrix">
+                <a href="./" class="logo" aria-label="Qidrix — на главную">
                     <svg class="logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
                         <path d="M 10 10 H 80 V 60 H 60 V 30 H 30 V 60 H 60 V 80 H 10 Z" class="svg-fill-main" />
                         <rect x="60" y="60" width="30" height="30" class="svg-fill-cyan" />
@@ -577,14 +598,14 @@
                         <span data-ru="Демо-карьер" data-en="Demo mine" data-kk="Демо-карьер" data-uz="Demo karyer">Демо-карьер</span>
                     </a>
 
-                    <button class="theme-toggle-btn icon-btn" onclick="toggleTheme()" aria-label="Toggle Theme" id="themeBtn">
+                    <button class="theme-toggle-btn icon-btn" onclick="toggleTheme()" aria-label="Сменить тему" data-aria-ru="Сменить тему" data-aria-en="Toggle theme" data-aria-kk="Тақырыпты ауыстыру" data-aria-uz="Mavzuni almashtirish" id="themeBtn">
                         <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
                         </svg>
                     </button>
 
                     <div class="lang-dropdown" id="langDropdown">
-                        <button class="lang-menu-btn" onclick="toggleDropdown(event)" aria-label="Select Language">
+                        <button class="lang-menu-btn" onclick="toggleDropdown(event)" aria-label="Выбрать язык" data-aria-ru="Выбрать язык" data-aria-en="Choose language" data-aria-kk="Тілді таңдау" data-aria-uz="Tilni tanlash" aria-haspopup="true">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <circle cx="12" cy="12" r="10"></circle>
                                 <line x1="2" y1="12" x2="22" y2="12"></line>
@@ -600,7 +621,7 @@
                         </div>
                     </div>
 
-                    <button class="burger-btn" onclick="toggleMenu()" aria-label="Menu">
+                    <button class="burger-btn" onclick="toggleMenu()" aria-label="Меню" data-aria-ru="Меню" data-aria-en="Menu" data-aria-kk="Мәзір" data-aria-uz="Menyu" aria-controls="sidePanel">
                         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <line x1="3" y1="12" x2="21" y2="12"></line>
                             <line x1="3" y1="6" x2="21" y2="6"></line>
@@ -614,7 +635,7 @@
 
     <div class="panel-overlay" id="panelOverlay" onclick="toggleMenu()"></div>
     <div class="side-panel" id="sidePanel">
-        <button class="close-btn" onclick="toggleMenu()" aria-label="Close">
+        <button class="close-btn" onclick="toggleMenu()" aria-label="Закрыть меню" data-aria-ru="Закрыть меню" data-aria-en="Close menu" data-aria-kk="Мәзірді жабу" data-aria-uz="Menyuni yopish">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <line x1="18" y1="6" x2="6" y2="18"></line>
                 <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -632,18 +653,19 @@
         </div>
     </div>
 
-    <div class="nav-dots">
-        <a href="#slide-1" title="Главная"></a>
-        <a href="#slide-2" title="Отраслевые решения"></a>
-        <a href="#slide-3" title="Наш подход"></a>
-        <a href="#slide-4" title="Технологии"></a>
-        <a href="#slide-5" title="Экономика"></a>
-        <a href="#slide-6" title="Контакты"></a>
-    </div>
+    <nav class="nav-dots" aria-label="Разделы страницы">
+        <a href="#slide-1" title="Главная" aria-label="Главная"></a>
+        <a href="#slide-2" title="Отраслевые решения" aria-label="Отраслевые решения"></a>
+        <a href="#slide-3" title="Наш подход" aria-label="Наш подход"></a>
+        <a href="#slide-4" title="Технологии" aria-label="Технологии"></a>
+        <a href="#slide-5" title="Экономика" aria-label="Экономика"></a>
+        <a href="#slide-6" title="Контакты" aria-label="Контакты"></a>
+    </nav>
 
+    <main id="content" tabindex="-1">
     <!-- Слайд 1: Полноэкранное видео с емким слоганом и кнопкой -->
     <section id="slide-1">
-        <video autoplay loop muted playsinline class="hero-bg-video">
+        <video autoplay loop muted playsinline disablepictureinpicture preload="auto" poster="assets/img/hero-poster.webp" aria-hidden="true" class="hero-bg-video">
             <source src="video.mp4" type="video/mp4">
         </video>
         
@@ -861,7 +883,7 @@
 
         <div class="contact-card">
             <div class="contact-avatar-wrap">
-                <img class="contact-avatar" src="https://1.gravatar.com/avatar/adde74c9ad88c97f54a2c29340dcef5d95b7b27e451fc0fb66700be6aa301038?s=256&amp;d=initials" width="112" height="112" alt="Timur Salikhov" loading="lazy">
+                <img class="contact-avatar" src="assets/img/timur-salikhov.webp" width="112" height="112" alt="Timur Salikhov" loading="lazy">
                 <span class="contact-status" aria-hidden="true"></span>
             </div>
             <div class="contact-name" data-ru="Тимур Салихов" data-en="Timur Salikhov" data-kk="Тимур Салихов" data-uz="Timur Salixov">Тимур Салихов</div>
@@ -878,6 +900,8 @@
             </div>
         </div>
     </section>
+
+    </main>
 
     <footer>
         <div class="container footer-content">
@@ -1003,7 +1027,7 @@
                 savedLang = localStorage.getItem('qidrix_lang');
             } catch (e) {}
 
-            const currentTheme = savedTheme ? savedTheme : 'dark';
+            const currentTheme = savedTheme ? savedTheme : (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
             document.documentElement.setAttribute('data-theme', currentTheme);
             updateThemeIcon(currentTheme);
             setLang(savedLang ? savedLang : 'ru');
@@ -1014,5 +1038,7 @@
             }
         });
     </script>
+    <script src="assets/motion.js" defer></script>
+    <script src="assets/site.js" defer></script>
 </body>
 </html>
