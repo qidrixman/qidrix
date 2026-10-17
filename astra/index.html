@@ -37,7 +37,7 @@
     <meta name="theme-color" content="#121417">
     <title>SCADA 6/10 кВ для электросетей Караганды — кейс | Qidrix</title>
     <link rel="preload" href="../assets/fonts/Inter-400-cyrillic.woff2" as="font" type="font/woff2" crossorigin="">
-    <link rel="stylesheet" href="../assets/fonts/fonts.css">
+    <link rel="stylesheet" href="../assets/fonts/fonts.css?v=dac094ee">
     <script>
         if ('scrollRestoration' in history) {
             history.scrollRestoration = 'manual';
@@ -551,7 +551,7 @@
         main:focus { outline: none; }
         a:focus-visible, button:focus-visible, select:focus-visible { outline: 2px solid var(--accent-cyan); outline-offset: 3px; }
     </style>
-    <link rel="stylesheet" href="../assets/motion.css">
+    <link rel="stylesheet" href="../assets/motion.css?v=6b4d70b5">
     <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://qidrix.asia/#org","name":"Qidrix","url":"https://qidrix.asia/","logo":{"@type":"ImageObject","url":"https://qidrix.asia/assets/img/icon-512.png","width":512,"height":512},"image":"https://qidrix.asia/assets/img/og.jpg","description":"Интегратор промышленных инноваций: промышленные радиосети, SCADA, телеметрия, диспетчеризация карьеров и ИИ-аналитика для горной добычи, энергетики и сельского хозяйства.","areaServed":[{"@type":"Country","name":"Kazakhstan"},{"@type":"Country","name":"Uzbekistan"}],"knowsAbout":["SCADA","Industrial wireless networks","Telemetry","Fleet management system","Open-pit mine dispatching","Fuel monitoring","Industrial IoT","AI video analytics"],"contactPoint":[{"@type":"ContactPoint","contactType":"sales","telephone":"+7-777-256-53-89","email":"timur.salikhov@avatech.kz","areaServed":["KZ","UZ"],"availableLanguage":["ru","en","kk","uz"]}],"sameAs":["https://www.linkedin.com/in/timursalikhov","https://t.me/timuverse"]},{"@type":"WebSite","@id":"https://qidrix.asia/#website","name":"Qidrix","url":"https://qidrix.asia/","inLanguage":["ru","en","kk","uz"],"publisher":{"@id":"https://qidrix.asia/#org"}},{"@type":"WebPage","@id":"https://qidrix.asia/astra/#webpage","url":"https://qidrix.asia/astra/","name":"SCADA 6/10 кВ для электросетей Караганды — кейс | Qidrix","description":"Как Qidrix и Astrawireless построили беспроводную сеть SCADA и телеметрии для ТОО «Қарағанды Жарық»: 30 базовых станций, 1 847 абонентских точек, 15 сетевых районов. 3D-пролёт по проекту.","inLanguage":"ru","isPartOf":{"@id":"https://qidrix.asia/#website"},"about":{"@id":"https://qidrix.asia/#org"},"primaryImageOfPage":"https://qidrix.asia/assets/img/og.jpg","breadcrumb":{"@id":"https://qidrix.asia/astra/#breadcrumbs"}},{"@type":"BreadcrumbList","@id":"https://qidrix.asia/astra/#breadcrumbs","itemListElement":[{"@type":"ListItem","position":1,"name":"Главная","item":"https://qidrix.asia/"},{"@type":"ListItem","position":2,"name":"Беспроводная сеть SCADA для электросетей","item":"https://qidrix.asia/astra/"}]},{"@type":"Service","@id":"https://qidrix.asia/astra/#service","name":"Беспроводная сеть SCADA для электросетей","serviceType":"Wireless SCADA network for power grids","description":"Как Qidrix и Astrawireless построили беспроводную сеть SCADA и телеметрии для ТОО «Қарағанды Жарық»: 30 базовых станций, 1 847 абонентских точек, 15 сетевых районов. 3D-пролёт по проекту.","provider":{"@id":"https://qidrix.asia/#org"},"areaServed":[{"@type":"Country","name":"Kazakhstan"},{"@type":"Country","name":"Uzbekistan"}],"url":"https://qidrix.asia/astra/"}]}</script>
 </head>
 <body>
@@ -657,7 +657,7 @@
     <section id="case-hero" class="flyover-section">
         <h1 class="visually-hidden" data-ru="Внедрение SCADA и телеметрии" data-en="SCADA and Telemetry Implementation" data-kk="SCADA және телеметрияны енгізу" data-uz="SCADA va telemetriyani joriy etish">Внедрение SCADA и телеметрии</h1>
         <div class="flyover-frame" id="flyoverFrame">
-            <iframe id="flyover" data-src="flyover/index.html" title="Пролёт: беспроводная сеть SCADA Караганды" allow="fullscreen"></iframe>
+            <iframe id="flyover" data-src="flyover/index.html?v=1220b048" title="Пролёт: беспроводная сеть SCADA Караганды" allow="fullscreen"></iframe>
             <button type="button" class="flyover-full" id="flyoverFull" aria-label="На весь экран" title="На весь экран" hidden>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3" /></svg>
             </button>
@@ -666,7 +666,8 @@
             // Пролёт открывается сразу на языке сайта.
             (function () {
                 var frame = document.getElementById('flyover');
-                frame.src = frame.getAttribute('data-src') + '?embed=1&lang=' + encodeURIComponent(document.documentElement.lang || 'ru');
+                var src = frame.getAttribute('data-src');
+                frame.src = src + (src.indexOf('?') < 0 ? '?' : '&') + 'embed=1&lang=' + encodeURIComponent(document.documentElement.lang || 'ru');
             })();
         </script>
     </section>
@@ -1041,7 +1042,7 @@
             }
         });
     </script>
-    <script src="../assets/motion.js" defer></script>
-    <script src="../assets/site.js" defer></script>
+    <script src="../assets/motion.js?v=8bb6fbe9" defer></script>
+    <script src="../assets/site.js?v=4f10116e" defer></script>
 </body>
 </html>
